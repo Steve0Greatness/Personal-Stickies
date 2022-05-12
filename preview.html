@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Add Topic</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+	
+<body>
+	<form action="/api/parseURL" method="get">
+		<fieldset>
+			<legend>From URL</legend>
+			<input type="url" required name="url" pattern="https?://scratch\.mit\.edu\/discuss\/topic\/.+">
+			<input type="submit" value="Add From URL">
+			<button type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[3])">Preview</button>
+		</fieldset>
+	</form>
+	<form action="/api/add" method="get">
+		<fieldset>
+			<legend>From Id</legend>
+			<input type="number" required name="topicId">
+			<input type="submit" value="Add From Id">
+			<button type="button" onclick="preview(this.parentElement.querySelector('input').value.toString())">Preview</button>
+		</fieldset>
+	</form>
+	<div id="preview"></div>
+	<script src="/preview.js"></script>
+</body>
+	
+</html>

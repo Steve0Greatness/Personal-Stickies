@@ -1,0 +1,41 @@
+:any-link.account,
+button,
+input[type="submit"],
+:any-link.button {
+	background-color: #ccc;
+	color: #100;
+	border: #100 solid 1px;
+	padding: 2px;
+	width: fit-content;
+	text-decoration: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-family: sans-serif;
+	font-size: 1rem;
+}
+
+:any-link.account,
+button,
+.new_line {
+	display: block;
+}
+
+input:not([type="submit"]) {
+	color: #001;
+	border: #001 solid 1px;
+	border-radius: 5px;
+	padding: 2px;
+}
+
+form {
+	margin: 5px;
+}
+
+:any-link.nav {
+	color: purple;
+	margin: 15px;
+}
+
+nav {
+	margin-bottom: 5px;
+}
