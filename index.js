@@ -5,9 +5,11 @@ const express = require('express'),
 	fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args)),
 	fs = require('fs'),
 	cors = require('cors');
+require("ejs");
 
 app.use(cp());
 app.use(express.static('static'));
+app.set('view engine', 'ejs');
 app.use(async (req, res, next) => {
 	let uuid_exists = await uuids.get(req.cookies.uuid);
 	if (uuid_exists === undefined) {
@@ -150,7 +152,7 @@ app.get('/add', (req, res) => {
 		res.clearCookie('uuid');
 		gobackhome(res);
 	}
-	res.sendFile(__dirname + '/preview.html')
+	setTimeout(() => res.sendFile(__dirname + '/preview.html'), 1000)
 });
 
 app.get('/remove', (req, res) => {
@@ -158,28 +160,11 @@ app.get('/remove', (req, res) => {
 		res.clearCookie('uuid');
 		gobackhome(res);
 	}
-	res.sendFile(__dirname + '/remove.html')
+	setTimeout(() => res.sendFile(__dirname + '/remove.html'), 1000)
 });
 
 app.get('/', (req, res) => {
-	res.send(`<!doctype html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Home</title>
-	<link rel="stylesheet" href="/style.css">
-</head>
-
-<body>
-	<h1>Personal Stickies</h1>
-	${!('uuid' in req.cookies) ? '<a class="account" href="/signin">Login</a>' : '<nav><a class="nav" href="/add">Add Stickies</a> <a class="nav" href="/remove">Remove Sticky</a></nav><a class="account" href="/logout">Logout</a>'}
-	<form action="/api/user_redirect"><label for="user">Find a user:</label> <input required type="text" id="user" name="user"><p><input type="submit" value="Go to profile"> <a href="/all_users" class="button">See All Users</a></p></form>
-</body>
-
-</html>`)
+	setTimeout(() => res.render(`index`, { bool: ('uuid' in req.cookies) }), 1000)
 })
 
 app.get('/users/:user', (req, res) => {
@@ -211,7 +196,7 @@ app.get('/users/:user', (req, res) => {
 			html += `<h1>This User Doesn't Have Any Stickies</h1>`
 		}
 		html += '</div>'
-		res.send(`<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${name}'(s) Personal Stickies</title><link rel="stylesheet" href="/style.css"></head><body>${html}</body></html>`)
+		res.render('user', { html: html, name: name })
 	})
 })
 
@@ -226,12 +211,7 @@ app.get('/all_users', (req, res) => {
 			html += `<li><a href="/users/${body[user].user.name}">${body[user].user.name}</a></li>`
 		}
 		html += `</ul>`
-		setTimeout(() => { res.send(`<!doctype html><html lang="en-US">
-<head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>All Users</title><link rel="stylesheet" href="/style.css"></head>
-<body><h1>All Users</h1>
-<p>These are all the users on this platform</p>
-${html}</body>
-</html>`) }, 100)
+		setTimeout(() => { res.render('all_users', { html: html }) }, 100)
 	})
 })
 
