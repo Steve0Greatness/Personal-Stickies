@@ -10,6 +10,7 @@
 </head>
 	
 <body>
+	<h1>Add a Topic</h1>
 	<form action="/api/parseURL" method="get">
 		<fieldset>
 			<legend>From URL</legend>
@@ -26,7 +27,10 @@
 			<button type="button" onclick="preview(this.parentElement.querySelector('input').value.toString())">Preview</button>
 		</fieldset>
 	</form>
-	<div id="preview"></div>
+	<dialog>
+		<h2>Previewing</h2>
+		<div id="preview"></div>
+	</dialog>
 	<script src="/preview.js"></script>
 </body>
 	

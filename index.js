@@ -145,15 +145,17 @@ app.get('/signin', (req, res) => {
 });
 
 app.get('/add', (req, res) => {
-	if (!('uuid' in req.cookies)) {
-		res.redirect('/')
+	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
+		res.clearCookie('uuid');
+		gobackhome(res);
 	}
 	res.sendFile(__dirname + '/preview.html')
 });
 
 app.get('/remove', (req, res) => {
-	if (!('uuid' in req.cookies)) {
-		res.redirect('/')
+	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
+		res.clearCookie('uuid');
+		gobackhome(res);
 	}
 	res.sendFile(__dirname + '/remove.html')
 });
@@ -173,7 +175,7 @@ app.get('/', (req, res) => {
 <body>
 	<h1>Personal Stickies</h1>
 	${!('uuid' in req.cookies) ? '<a class="account" href="/signin">Login</a>' : '<nav><a class="nav" href="/add">Add Stickies</a> <a class="nav" href="/remove">Remove Sticky</a></nav><a class="account" href="/logout">Logout</a>'}
-	<form action="/api/user_redirect"><label for="user">Find a user:</label> <input type="text" id="user" name="user"><p><input type="submit" value="Go to profile"> <a href="/all_users" class="button">See All Users</a></p></form>
+	<form action="/api/user_redirect"><label for="user">Find a user:</label> <input required type="text" id="user" name="user"><p><input type="submit" value="Go to profile"> <a href="/all_users" class="button">See All Users</a></p></form>
 </body>
 
 </html>`), 150)
@@ -204,6 +206,9 @@ app.get('/users/:user', (req, res) => {
     <a href="//scratch.mit.edu/discuss/topic/${topic_ID}/unread/">(New Posts)</a>
 </div>`;
 		}
+		if (user.stickies.length === 0) {
+			html += `<h1>This User Doesn't Have Any Stickies</h1>`
+		}
 		html += '</div>'
 		res.send(`<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${name}'(s) Personal Stickies</title><link rel="stylesheet" href="/style.css"></head><body>${html}</body></html>`)
 	})
@@ -213,7 +218,6 @@ app.get('/all_users', (req, res) => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err) {
 			throw err;
-			return;
 		}
 		let body = JSON.parse(data),
 			html = `<ul>`;
@@ -234,6 +238,19 @@ app.get('/api/user_redirect', (req, res) => {
 	res.redirect(`/users/${req.query.user}`)
 })
 
-app.listen(3000, () => {
-	// I might put something here
-});
+app.get('/api/user/:user', (req, res) => {
+	fs.readFile(__dirname + '/users.json', (err, data) => {
+		if (err)
+			throw err;
+		let body = JSON.parse(data),
+			user = req.params.user,
+			user_data = body[user.toLowerCase()];
+		res.send(user_data);
+	})
+})
+
+app.get('/credits', (req, res) => {
+	res.sendFile(__dirname + '/credits.html')
+})
+
+app.listen(3000, () => {});

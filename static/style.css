@@ -39,3 +39,8 @@ form {
 nav {
 	margin-bottom: 5px;
 }
+
+dialog {
+	padding: 1em;
+	padding-top: 0;
+}
