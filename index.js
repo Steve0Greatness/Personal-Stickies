@@ -3,7 +3,8 @@ const express = require('express'),
 	cp = require('cookie-parser'),
 	uuids = require('store'),
 	fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args)),
-	fs = require('fs');
+	fs = require('fs'),
+	cors = require('cors');
 
 app.use(cp());
 app.use(express.static('static'));
@@ -161,7 +162,7 @@ app.get('/remove', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-	setTimeout(() => res.send(`<!doctype html>
+	res.send(`<!doctype html>
 <html lang="en">
 
 <head>
@@ -178,7 +179,7 @@ app.get('/', (req, res) => {
 	<form action="/api/user_redirect"><label for="user">Find a user:</label> <input required type="text" id="user" name="user"><p><input type="submit" value="Go to profile"> <a href="/all_users" class="button">See All Users</a></p></form>
 </body>
 
-</html>`), 150)
+</html>`)
 })
 
 app.get('/users/:user', (req, res) => {
@@ -238,7 +239,7 @@ app.get('/api/user_redirect', (req, res) => {
 	res.redirect(`/users/${req.query.user}`)
 })
 
-app.get('/api/user/:user', (req, res) => {
+app.get('/api/user/:user', cors(), (req, res) => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err)
 			throw err;
@@ -250,7 +251,7 @@ app.get('/api/user/:user', (req, res) => {
 })
 
 app.get('/credits', (req, res) => {
-	res.sendFile(__dirname + '/credits.html')
+	res.sendFile(__dirname + '/credits.html');
 })
 
 app.listen(3000, () => {});
