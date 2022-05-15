@@ -13,7 +13,9 @@
 	<nav>
 		<a href="/" class="nav">Back Home</a>
 	</nav>
+	<h1>User's Stickies</h1>
 	<div id="user_info"><a href="//scratch.mit.edu/users/<%- name -%>"><img src="//cdn2.scratch.mit.edu/get_image/user/<%- user.user.id -%>_<%- size -%>x<%- size -%>.png"><%- name -%></a></div><div id="user_pins">
+	<main>
 	<% for (let s of user.stickies) { %>
 		<div class="sticky">
     	<img src="/sticky.png"> Sticky:
@@ -25,6 +27,7 @@
 	<% if (user.stickies.length === 0) { %>
 		<h1>This User Doesn't Have Any Stickies</h1>
 	<% } %>
+	</main>
 </body>
 
 </html>

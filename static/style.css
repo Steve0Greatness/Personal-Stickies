@@ -68,3 +68,7 @@ dialog {
 	padding: 1em;
 	padding-top: 0;
 }
+
+.preview {
+	margin-top: 2px;
+}
