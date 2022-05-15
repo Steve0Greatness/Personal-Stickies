@@ -25,7 +25,7 @@
 	<ul>
 		<% for (let user of body) { %>
 		<li>
-			Steve0Greatness:
+			<%- user.names.shown -%>:
 			<% if ('scratch' in user.names) { %>
 			<a href="//scratch.mit.edu/users/steve0greatness">Scratch</a><% } %><% if ('scratch' in user.names && 'github' in user.names) { %>,<% } %>
 			<% if ('github' in user.names) { %><a href="//github.com/steve0greatness">Github</a><% } %>;
