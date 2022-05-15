@@ -212,7 +212,9 @@ app.get('/api/users/:user', cors(), (req, res) => {
 })
 
 app.get('/credits', (req, res) => {
-	res.sendFile(__dirname + '/credits.html');
+	fs.readFile(__dirname + '/static/contributers.json', (err, data) => {
+		res.render('credits', { body: JSON.parse(data) });
+	})
 })
 
 app.listen(3000, () => {});

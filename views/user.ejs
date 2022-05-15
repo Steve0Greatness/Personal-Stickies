@@ -10,6 +10,9 @@
 </head>
 	
 <body>
+	<nav>
+		<a href="/" class="nav">Back Home</a>
+	</nav>
 	<div id="user_info"><a href="//scratch.mit.edu/users/<%- name -%>"><img src="//cdn2.scratch.mit.edu/get_image/user/<%- user.user.id -%>_<%- size -%>x<%- size -%>.png"><%- name -%></a></div><div id="user_pins">
 	<% for (let s of user.stickies) { %>
 		<div class="sticky">
