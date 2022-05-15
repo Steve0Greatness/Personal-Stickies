@@ -11,6 +11,10 @@
 <body>
 	<h1>All Users</h1>
 	<p>These are all the users on this platform</p>
-	<%- html -%>
+	<ul>
+		<% for (let user in body) { %>
+		<li><a href="/users/<%- body[user].user.name -%>"><%- body[user].user.name -%></a></li>
+		<% } %>
+	</ul>
 </body>
 </html>

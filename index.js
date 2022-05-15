@@ -176,27 +176,13 @@ app.get('/users/:user', (req, res) => {
 		let body = JSON.parse(data),
 			user = req.params.user
 		if (!(user.toLowerCase() in body)) {
-			res.send("<h1>USER NOT FOUND</h1>")
+			res.render("error", { code: 404, msg: "User Not Found", desc: "The requested user could not be found by the server." })
 			return;
 		}
 		user = body[user.toLowerCase()]
-		let { id, name } = user.user,
-			size = "16",
-			html = `<div id="user_info"><a href="//scratch.mit.edu/users/${name}"><img src="//cdn2.scratch.mit.edu/get_image/user/${id}_${size}x${size}.png">${name}</a></div><div id="user_pins">`
-		for (let s of user.stickies) {
-			let { topic_ID, topic_NAME, topic_OWNER } = s;
-			html += `<div class="sticky">
-    <img src="/sticky.png"> Sticky:
-    <a href="//scratch.mit.edu/discuss/topic/${topic_ID}">${topic_NAME}</a>
-    by ${topic_OWNER}
-    <a href="//scratch.mit.edu/discuss/topic/${topic_ID}/unread/">(New Posts)</a>
-</div>`;
-		}
-		if (user.stickies.length === 0) {
-			html += `<h1>This User Doesn't Have Any Stickies</h1>`
-		}
-		html += '</div>'
-		res.render('user', { html: html, name: name })
+		let name = user.user.name,
+			size = "16";
+		res.render('user', { name: name, user: user, size: size })
 	})
 })
 
@@ -205,13 +191,8 @@ app.get('/all_users', (req, res) => {
 		if (err) {
 			throw err;
 		}
-		let body = JSON.parse(data),
-			html = `<ul>`;
-		for (let user in body) {
-			html += `<li><a href="/users/${body[user].user.name}">${body[user].user.name}</a></li>`
-		}
-		html += `</ul>`
-		setTimeout(() => { res.render('all_users', { html: html }) }, 100)
+		let body = JSON.parse(data);
+		setTimeout(() => { res.render('all_users', { body: body }) }, 100)
 	})
 })
 
@@ -219,7 +200,7 @@ app.get('/api/user_redirect', (req, res) => {
 	res.redirect(`/users/${req.query.user}`)
 })
 
-app.get('/api/user/:user', cors(), (req, res) => {
+app.get('/api/users/:user', cors(), (req, res) => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err)
 			throw err;
