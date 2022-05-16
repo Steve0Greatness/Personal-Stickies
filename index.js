@@ -71,7 +71,7 @@ app.get('/api/add', (req, res) => {
 			return;
 		}
 		let body = JSON.parse(data);
-		if (!uuids.get(req.cookies.uuid) || !("uuid" in req.cookies)) {
+		if (uuids.get(req.cookies.uuid) !== undefined || !("uuid" in req.cookies)) {
 			gobackhome(res)
 			return;
 		}
@@ -126,7 +126,7 @@ app.get('/api/remove', (req, res) => {
 			console.error(err);
 			return;
 		}
-		if (!uuids.get(req.cookies.uuid) || !("uuid" in req.cookies)) {
+		if (uuids.get(req.cookies.uuid) !== undefined || !("uuid" in req.cookies)) {
 			gobackhome(res)
 			return;
 		}
@@ -213,8 +213,16 @@ app.get('/api/users/:user', cors(), (req, res) => {
 
 app.get('/credits', (req, res) => {
 	fs.readFile(__dirname + '/static/contributers.json', (err, data) => {
+		if (err)
+			throw err;
 		res.render('credits', { body: JSON.parse(data) });
 	})
 })
 
-app.listen(3000, () => {});
+app.listen(3000, () => {
+	fs.readFile(__dirname + "/users.json", (err, data) => {
+		if (err)
+			throw err;
+		console.log(`There are ${Object.keys(JSON.parse(data)).length} user(s) in the DataBase`);
+	})
+});

@@ -21,16 +21,16 @@
 		<li><a href="//djangobb.org">DJangoBB</a> for some assets.</li>
 	</ul>
 	<h2>Contributors</h2>
-	<p>These are people who contributed to the <a href="//github.com/steve0greatness/Personal-Stickies">Github Repository</a>, or gave ideas on the <a href="https://scratch.mit.edu/discuss/topic/604367">Forum Thread</a> that got implimented.</p>
+	<p>These are people who contributed to the <a href="//github.com/steve0greatness/Personal-Stickies">Github Repository</a>, or gave ideas on the <a href="https://scratch.mit.edu/discuss/topic/604367">Forum Thread</a>(or also on the repository) that got implimented.</p>
 	<ul>
 		<% for (let user of body) { %>
 		<li>
 			<%- user.names.shown -%>:
 			<% if ('scratch' in user.names) { %>
-			<a href="//scratch.mit.edu/users/steve0greatness">Scratch</a><% } %><% if ('scratch' in user.names && 'github' in user.names) { %>,<% } %>
-			<% if ('github' in user.names) { %><a href="//github.com/steve0greatness">Github</a><% } %>;
+			<a href="//scratch.mit.edu/users/<%- user.names.scratch -%>">Scratch</a><% } %><% if ('scratch' in user.names && 'github' in user.names) { %>,<% } %>
+			<% if ('github' in user.names) { %><a href="//github.com/<%- user.names.github -%>">Github</a><% } %>;
 			<% for (let role of user.roles) { %>
-			<span title="<%- role.name -%>"><%- role.emoji -%></span>
+			<span title="<%- role.name -%>" class="emoji"><%- role.emoji -%></span>
 			<% } %>
 		</li>
 		<% } %>
