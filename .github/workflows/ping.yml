@@ -1,0 +1,17 @@
+# copied from leahcimto/randomJokeAPI
+name: Keep Alive
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  Ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Curl URL
+        run: |
+          curl -s -S --retry 2 personal-stickies.stevesgreatness.repl.co/
