@@ -87,3 +87,21 @@ dialog {
 	position: absolute;
 	right: 5%;
 }
+
+code {
+	background-color: #eee;
+	font-family: monospace;
+	font-size: 1rem;
+	font-weight: bold;
+	color: black;
+}
+
+code.smaller {
+	font-size: initial;
+	font-weight: normal;
+}
+
+code.snippet {
+	white-space: pre-wrap;
+	display: block;
+}

@@ -255,6 +255,10 @@ app.get('/me_embed', (req, res) => {
 	});
 });
 
+app.get('/api', (req, res) => {
+	res.sendFile(__dirname + "/docs.html");
+})
+
 app.listen(3000, () => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err) throw err;
