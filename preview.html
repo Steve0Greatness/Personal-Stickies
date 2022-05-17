@@ -21,7 +21,7 @@
 			<legend>From URL</legend>
 			<input type="url" required name="url" pattern="https?://scratch\.mit\.edu\/discuss\/topic\/.+">
 			<input type="submit" value="Add From URL">
-			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[3])">Preview</button>
+			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[5])">Preview</button>
 		</fieldset>
 	</form>
 	<form action="/api/add" method="get">
@@ -33,7 +33,7 @@
 		</fieldset>
 	</form>
 	<dialog>
-		<h2>Previewing</h2>
+		<h2>Previewing<button id="close_preview">X</button></h2>
 		<div id="preview"></div>
 	</dialog>
 	<iframe class="me" src="/me_embed"></iframe>

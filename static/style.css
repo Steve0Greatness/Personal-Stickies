@@ -78,3 +78,12 @@ dialog {
 	min-height: 1rem;
 	border: none;
 }
+
+#close_preview {
+	background: inherit;
+	color: black;
+	display: inline-block;
+	font-size: 1rem;
+	position: absolute;
+	right: 5%;
+}
