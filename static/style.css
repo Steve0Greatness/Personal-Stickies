@@ -72,3 +72,9 @@ dialog {
 .preview {
 	margin-top: 2px;
 }
+
+.me {
+	min-width: 100%;
+	min-height: 1rem;
+	border: none;
+}

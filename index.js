@@ -71,12 +71,12 @@ app.get('/api/add', (req, res) => {
 			return;
 		}
 		let body = JSON.parse(data);
-		if (uuids.get(req.cookies.uuid) !== undefined || !("uuid" in req.cookies)) {
+		if (uuids.get(req.cookies.uuid) === undefined || !("uuid" in req.cookies)) {
 			gobackhome(res)
 			return;
 		}
 		let user = uuids.get(req.cookies.uuid);
-		if (!(user in body)) {
+		if (!(user.toLowerCase() in body)) {
 			fetch(`https://scratchdb.lefty.one/v3/user/info/${user}`)
 				.then(s => s.json())
 				.then(d => {
@@ -126,7 +126,7 @@ app.get('/api/remove', (req, res) => {
 			console.error(err);
 			return;
 		}
-		if (uuids.get(req.cookies.uuid) !== undefined || !("uuid" in req.cookies)) {
+		if (uuids.get(req.cookies.uuid) === undefined || !("uuid" in req.cookies)) {
 			gobackhome(res)
 			return;
 		}
@@ -216,6 +216,31 @@ app.get('/credits', (req, res) => {
 		if (err)
 			throw err;
 		res.render('credits', { body: JSON.parse(data) });
+	})
+})
+
+app.get('/me', (req, res) => {
+	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
+		res.redirect('/');
+		return;
+	}
+	res.redirect(`/users/${uuids.get(req.cookies.uuid)}`);
+})
+
+app.get('/me_embed', (req, res) => {
+	fs.readFile(__dirname + '/users.json', (err, data) => {
+		if (err)
+			throw err;
+		let body = JSON.parse(data);
+		if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
+			res.redirect('/')
+			return;
+		}
+		if (!(uuids.get(req.cookies.uuid).toLowerCase() in body)) {
+			res.send("")
+			return;
+		}
+		res.render('me', { stickies: body[uuids.get(req.cookies.uuid).toLowerCase()].stickies });
 	})
 })
 
