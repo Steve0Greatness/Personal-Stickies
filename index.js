@@ -41,7 +41,7 @@ app.get('/api/auth', (req, res) => {
 			}
 			let uuid = crypto.randomUUID();
 			uuids.set(uuid, d.username);
-			res.cookie('uuid', uuid, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+			res.cookie('uuid', uuid, { maxAge: 86400000, httpOnly: true });
 			gobackhome(res);
 		});
 });
@@ -216,8 +216,17 @@ app.get('/api/users/:user', cors(), (req, res) => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err) throw err;
 		let body = JSON.parse(data),
-			user = req.params.user,
-			user_data = body[user.toLowerCase()];
+			user = req.params.user;
+		if (!(user.toLowerCase() in body)) {
+			res.status(404);
+			res.send({
+				error: 404,
+				message: "User Not Found",
+				description: "The requested user could not be found by the server."
+			});
+			return;
+		}
+		let user_data = body[user.toLowerCase()];
 		res.send(user_data);
 	});
 });
@@ -265,4 +274,7 @@ app.listen(3000, () => {
 		console.log(`There are ${Object.keys(JSON.parse(data)).length} user(s) in the DataBase`
 		);
 	});
+	setInterval(() => {
+		uuids.clearAll()
+	}, 86400000)
 });

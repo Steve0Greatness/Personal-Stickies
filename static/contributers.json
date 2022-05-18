@@ -5,6 +5,7 @@
 			"github": "steve0greatness",
 			"shown": "Steve0Greatness"
 		},
+		"inDB": true,
 		"roles": [
 			{
 				"name": "coding",
@@ -22,6 +23,7 @@
 			"github": "MystPi",
 			"shown": "NFlex23"
 		},
+		"inDB": true,
 		"roles": [
 			{
 				"name": "styling",

@@ -27,8 +27,9 @@
 		<li>
 			<%- user.names.shown -%>:
 			<% if ('scratch' in user.names) { %>
-			<a href="//scratch.mit.edu/users/<%- user.names.scratch -%>">Scratch</a><% } %><% if ('scratch' in user.names && 'github' in user.names) { %>,<% } %>
-			<% if ('github' in user.names) { %><a href="//github.com/<%- user.names.github -%>">Github</a><% } %>;
+			<a class="scratch" href="//scratch.mit.edu/users/<%- user.names.scratch -%>">Scratch</a><% } %><% if ('scratch' in user.names && 'github' in user.names) { %>,<% } %>
+			<% if ('github' in user.names) { %><a class="github" href="//github.com/<%- user.names.github -%>">Github</a><% } %>;
+			<% if ('scratch' in user.names && user.inDB) { %><a class="their_stickies" href="/users/<%- user.names.scratch -%>">Their Stickies</a>;<% } %>
 			<% for (let role of user.roles) { %>
 			<span title="<%- role.name -%>" class="emoji"><%- role.emoji -%></span>
 			<% } %>

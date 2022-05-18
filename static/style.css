@@ -1,5 +1,10 @@
 @import url(https://rsms.me/inter/inter.css);
 
+:root {
+	--logos_size: 16px;
+	--logos_space: 16px;
+	--logos_options: left no-repeat;
+]}
 body {
 	font-family: 'Inter', sans-serif;
 	max-width: 50rem;
@@ -104,4 +109,28 @@ code.smaller {
 code.snippet {
 	white-space: pre-wrap;
 	display: block;
+}
+
+:any-link.github::before {
+	content: "  ";
+	padding-left: var(--logos_space);
+	background: url("/icons/github.png") var(--logos_options);
+	background-size: var(--logos_size);
+	filter: brightness(0%);
+}
+
+:any-link.scratch::before {
+	content: "  ";
+	padding-left: var(--logos_space);
+	background: url("/icons/scratch.png") var(--logos_options);
+	background-size: var(--logos_size);
+	filter: grayscale(100%);
+}
+
+:any-link.their_stickies::before {
+	content: "  ";
+	padding-left: var(--logos_space);
+	background: url("/favicon.ico") var(--logos_options);
+	background-size: var(--logos_size);
+	filter: brightness(0%);
 }
