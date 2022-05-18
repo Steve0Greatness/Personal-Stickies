@@ -4,7 +4,8 @@ const express = require('express'),
 	uuids = require('store'),
 	fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)),
 	fs = require('fs'),
-	cors = require('cors');
+	cors = require('cors'),
+	uuid_gen = require('uuid-random');
 require('ejs');
 
 app.use(cp());
@@ -22,15 +23,6 @@ function gobackhome(res, time = 150) {
 	setTimeout(() => res.redirect('/'), time);
 }
 
-let crypto;
-try {
-	(async function () {
-		crypto = await import('crypto');
-	})();
-} catch (err) {
-	console.error('crypto support is disabled!');
-}
-
 app.get('/api/auth', (req, res) => {
 	fetch(`https://auth.itinerary.eu.org/api/auth/verifyToken?privateCode=${req.query.privateCode}`)
 		.then((s) => s.json())
@@ -39,7 +31,7 @@ app.get('/api/auth', (req, res) => {
 				res.redirect('/');
 				return;
 			}
-			let uuid = crypto.randomUUID();
+			let uuid = uuid_gen();
 			uuids.set(uuid, d.username);
 			res.cookie('uuid', uuid, { maxAge: 86400000, httpOnly: true });
 			gobackhome(res);
@@ -56,12 +48,6 @@ app.get('/api/parseURL', (req, res) => {
 	let url = new URL(req.query.url);
 	url = url.pathname.split('/');
 	res.redirect(`/api/add?topicId=${url[3]}`);
-});
-
-app.get('/api/parseURL_', (req, res) => {
-	let url = new URL(req.query.url);
-	url = url.pathname.split('/');
-	res.redirect(`/api/remove?topicId=${url[3]}`);
 });
 
 app.get('/api/add', (req, res) => {
@@ -166,7 +152,13 @@ app.get('/remove', (req, res) => {
 		res.clearCookie('uuid');
 		gobackhome(res);
 	}
-	setTimeout(() => res.sendFile(__dirname + '/remove.html'), 1000);
+	fs.readFile(__dirname + '/users.json', (err, data) => {
+		if (err) throw err;
+		let body = JSON.parse(data),
+			user = uuids.get(req.cookies.uuid);
+			stickies = body[user.toLowerCase()].stickies;
+		setTimeout(() => res.render('remove', { stickies: stickies }), 1000);
+	})
 });
 
 app.get('/', (req, res) => {
@@ -277,4 +269,9 @@ app.listen(3000, () => {
 	setInterval(() => {
 		uuids.clearAll()
 	}, 86400000)
+	if (uuid_gen) {
+		console.log("👍")
+	} else {
+		console.log("😕")
+	}
 });

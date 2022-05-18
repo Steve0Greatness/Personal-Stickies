@@ -42,13 +42,19 @@ button,
 	display: block;
 }
 
-input:not([type="submit"]) {
+input:not([type="submit"]),
+select {
 	font: inherit;
+	background-color: white;
 	font-size: inherit;
 	color: #001;
 	border: #ccc solid 1px;
 	border-radius: 0.25rem;
 	padding: 0.25rem 0.5rem;
+}
+
+select {
+	margin-bottom: .25em;
 }
 
 form {
