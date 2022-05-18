@@ -14,4 +14,4 @@ jobs:
 
       - name: Curl URL
         run: |
-          curl -s -S --retry 2 personal-stickies.stevesgreatness.repl.co/
+          curl -s -S --retry 2 https://personal-stickies.stevesgreatness.repl.co/
