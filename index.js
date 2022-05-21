@@ -1,6 +1,6 @@
 const express = require('express'),
 	app = express(),
-	cp = require('cookie-parser'),
+	cookie_parser = require('cookie-parser'),
 	uuids = require('store'),
 	fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)),
 	fs = require('fs'),
@@ -9,7 +9,7 @@ const express = require('express'),
 	clear = 86400000/* 24 hours(24 * 60 * 60 * 1000) */;
 require('ejs');
 
-app.use(cp());
+app.use(cookie_parser());
 app.use(express.static('static'));
 app.set('view engine', 'ejs');
 app.use(async (req, res, next) => {
@@ -96,6 +96,7 @@ app.get('/api/add', (req, res) => {
 			fetch(`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`)
 				.then((s) => s.json())
 				.then((b) => {
+					body[user.toLowerCase()].stickies = body[user.toLowerCase()].stickies.filter(s => s.topic_ID !== b[0].topic.id)
 					body[user.toLowerCase()].stickies.push({
 						topic_ID: b[0].topic.id,
 						topic_NAME: b[0].topic.title,
@@ -142,8 +143,8 @@ app.get('/signin', (req, res) => {
 
 app.get('/add', (req, res) => {
 	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
-		res.clearCookie('uuid');
 		gobackhome(res);
+		return;
 	}
 	setTimeout(() => res.sendFile(__dirname + '/preview.html'), 1000);
 });
