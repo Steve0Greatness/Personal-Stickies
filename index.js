@@ -5,7 +5,8 @@ const express = require('express'),
 	fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)),
 	fs = require('fs'),
 	cors = require('cors'),
-	uuid_gen = require('uuid-random');
+	uuid_gen = require('uuid-random'),
+	clear = 86400000/* 24 hours(24 * 60 * 60 * 1000) */;
 require('ejs');
 
 app.use(cp());
@@ -33,7 +34,7 @@ app.get('/api/auth', (req, res) => {
 			}
 			let uuid = uuid_gen();
 			uuids.set(uuid, d.username);
-			res.cookie('uuid', uuid, { maxAge: 86400000, httpOnly: true });
+			res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
 			gobackhome(res);
 		});
 });
@@ -261,17 +262,20 @@ app.get('/api', (req, res) => {
 })
 
 app.listen(3000, () => {
+	console.log('-- Server Stats --')
+	const current_time = new Date();
+	console.log(`Server started: ${current_time.getMonth() + 1}(m) ${current_time.getDate()} ${current_time.getFullYear()} ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`);
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err) throw err;
-		console.log(`There are ${Object.keys(JSON.parse(data)).length} user(s) in the DataBase`
-		);
+		console.log(`There are ${Object.keys(JSON.parse(data)).length} user(s) in the DataBase`);
 	});
-	setInterval(() => {
-		uuids.clearAll()
-	}, 86400000)
 	if (uuid_gen) {
-		console.log("👍")
+		console.log('uuid generator: working 👍');
 	} else {
-		console.log("😕")
+		console.log('uuid generator: missing 😕');
 	}
+
+	setInterval(() => {
+		uuids.clearAll();
+	}, clear);
 });

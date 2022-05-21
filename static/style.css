@@ -115,6 +115,7 @@ code.smaller {
 code.snippet {
 	white-space: pre-wrap;
 	display: block;
+	padding: 2.5px;
 }
 
 :any-link.github::before {
