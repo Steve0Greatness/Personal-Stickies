@@ -4,7 +4,8 @@
 	--logos_size: 16px;
 	--logos_space: 16px;
 	--logos_options: left no-repeat;
-]}
+}
+
 body {
 	font-family: 'Inter', sans-serif;
 	max-width: 50rem;
@@ -43,7 +44,8 @@ button,
 }
 
 input:not([type="submit"]),
-select {
+select,
+textarea {
 	font: inherit;
 	background-color: white;
 	font-size: inherit;
@@ -140,4 +142,24 @@ code.snippet {
 	background: url("/favicon.ico") var(--logos_options);
 	background-size: var(--logos_size);
 	filter: brightness(0%);
+}
+
+.area {
+	padding: 15px;
+	background-color: #eee;
+	border-radius: 5px;
+	margin: 2px;
+}
+
+.input {
+	padding: 5px;
+	background-color: #fff;
+	border: #000 1px solid;
+	border-radius: 5px;
+	cursor: move;
+}
+
+#bb-code {
+	margin-top: 1rem;
+	padding: 15px;
 }

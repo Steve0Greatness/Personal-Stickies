@@ -2,21 +2,19 @@ const express = require('express'),
 	app = express(),
 	cookie_parser = require('cookie-parser'),
 	uuids = require('store'),
-	fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)),
+	fetch = (...args) =>
+		import('node-fetch').then(({ default: fetch }) => fetch(...args)),
 	fs = require('fs'),
 	cors = require('cors'),
 	uuid_gen = require('uuid-random'),
-	clear = 86400000/* 24 hours(24 * 60 * 60 * 1000) */;
+	clear = 86400000; /* 24 hours(24 * 60 * 60 * 1000) */
 require('ejs');
 
 app.use(cookie_parser());
 app.use(express.static('static'));
 app.set('view engine', 'ejs');
 app.use(async (req, res, next) => {
-	let uuid_exists = await uuids.get(req.cookies.uuid);
-	if (uuid_exists === undefined) {
-		res.clearCookie('uuid');
-	}
+	if (uuids.get(req.cookies.uuid) === undefined) res.clearCookie('uuid');
 	setTimeout(next, 150);
 });
 
@@ -25,7 +23,9 @@ function gobackhome(res, time = 150) {
 }
 
 app.get('/api/auth', (req, res) => {
-	fetch(`https://auth.itinerary.eu.org/api/auth/verifyToken?privateCode=${req.query.privateCode}`)
+	fetch(
+		`https://auth.itinerary.eu.org/api/auth/verifyToken?privateCode=${req.query.privateCode}`
+	)
 		.then((s) => s.json())
 		.then((d) => {
 			if (!d.valid) {
@@ -57,12 +57,22 @@ app.get('/api/add', (req, res) => {
 			console.error(err);
 			return;
 		}
-		let body = JSON.parse(data);
-		if (uuids.get(req.cookies.uuid) === undefined || !('uuid' in req.cookies)) {
+		if (
+			uuids.get(req.cookies.uuid) === undefined ||
+			!('uuid' in req.cookies) ||
+			isNaN(parseInt(req.query.topicId))
+		) {
 			gobackhome(res);
 			return;
 		}
-		let user = uuids.get(req.cookies.uuid);
+		let body = JSON.parse(data),
+			user = uuids.get(req.cookies.uuid),
+			current_time = new Date();
+		console.log(
+			`Adding ${req.query.topicId} to ${user} at ${
+				current_time.getMonth() + 1
+			} ${current_time.getDate()}, ${current_time.getFullYear()}, ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`
+		);
 		if (!(user.toLowerCase() in body)) {
 			fetch(`https://scratchdb.lefty.one/v3/user/info/${user}`)
 				.then((s) => s.json())
@@ -74,7 +84,9 @@ app.get('/api/add', (req, res) => {
 						},
 						stickies: [],
 					};
-					fetch(`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`)
+					fetch(
+						`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`
+					)
 						.then((s) => s.json())
 						.then((b) => {
 							body[user.toLowerCase()].stickies.push({
@@ -86,17 +98,21 @@ app.get('/api/add', (req, res) => {
 								__dirname + '/users.json',
 								JSON.stringify(body),
 								(e) => {
-									console.error(e);
+									if (e) throw e;
 								}
 							);
 							gobackhome(res, 150);
 						});
 				});
 		} else {
-			fetch(`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`)
+			fetch(
+				`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`
+			)
 				.then((s) => s.json())
 				.then((b) => {
-					body[user.toLowerCase()].stickies = body[user.toLowerCase()].stickies.filter(s => s.topic_ID !== b[0].topic.id)
+					body[user.toLowerCase()].stickies = body[
+						user.toLowerCase()
+					].stickies.filter((s) => s.topic_ID !== b[0].topic.id);
 					body[user.toLowerCase()].stickies.push({
 						topic_ID: b[0].topic.id,
 						topic_NAME: b[0].topic.title,
@@ -104,7 +120,7 @@ app.get('/api/add', (req, res) => {
 					});
 					let write = new Uint8Array(Buffer.from(JSON.stringify(body)));
 					fs.writeFile(__dirname + '/users.json', write, (e) => {
-						console.error(e);
+						if (e) throw e;
 					});
 					gobackhome(res, 150);
 				});
@@ -114,31 +130,39 @@ app.get('/api/add', (req, res) => {
 
 app.get('/api/remove', (req, res) => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
-		if (err) {
-			console.error(err);
-			return;
-		}
-		if (uuids.get(req.cookies.uuid) === undefined || !('uuid' in req.cookies)) {
+		if (err) throw err;
+		if (
+			uuids.get(req.cookies.uuid) === undefined || !('uuid' in req.cookies)
+		) {
 			gobackhome(res);
 			return;
 		}
 		let body = JSON.parse(data),
-			user = uuids.get(req.cookies.uuid);
+			user = uuids.get(req.cookies.uuid),
+			current_time = new Date();
+		console.log(
+			`Removing ${parseInt(req.query.topicId)} from ${user} at ${
+				current_time.getMonth() + 1
+			} ${current_time.getDate()}, ${current_time.getFullYear()}, ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`
+		);
 		body[user.toLowerCase()].stickies = body[
 			user.toLowerCase()
 		].stickies.filter((e) => e.topic_ID !== parseInt(req.query.topicId));
 		fs.writeFile(__dirname + '/users.json', JSON.stringify(body), (err) => {
-			if (err) {
-				console.error(err);
-			}
+			if (err) throw err;
 		});
 		gobackhome(res);
 	});
 });
 
 app.get('/signin', (req, res) => {
-	let red = Buffer.from('https://Personal-Stickies.stevesgreatness.repl.co/api/auth', 'utf-8').toString('base64');
-	res.redirect(`https://auth.itinerary.eu.org/auth/?redirect=${red}&name=Personal%20Stickies`);
+	let red = Buffer.from(
+		'https://Personal-Stickies.stevesgreatness.repl.co/api/auth',
+		'utf-8'
+	).toString('base64');
+	res.redirect(
+		`https://auth.itinerary.eu.org/auth/?redirect=${red}&name=Personal%20Stickies`
+	);
 });
 
 app.get('/add', (req, res) => {
@@ -158,9 +182,9 @@ app.get('/remove', (req, res) => {
 		if (err) throw err;
 		let body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
-			stickies = body[user.toLowerCase()].stickies;
+		stickies = body[user.toLowerCase()].stickies;
 		setTimeout(() => res.render('remove', { stickies: stickies }), 1000);
-	})
+	});
 });
 
 app.get('/', (req, res) => {
@@ -215,8 +239,8 @@ app.get('/api/users/:user', cors(), (req, res) => {
 			res.status(404);
 			res.send({
 				error: 404,
-				message: "User Not Found",
-				description: "The requested user could not be found by the server."
+				message: 'User Not Found',
+				description: 'The requested user could not be found by the server.',
 			});
 			return;
 		}
@@ -259,23 +283,37 @@ app.get('/me_embed', (req, res) => {
 });
 
 app.get('/api', (req, res) => {
-	res.sendFile(__dirname + "/docs.html");
-})
+	res.sendFile(__dirname + '/docs.html');
+});
 
-app.listen(3000, () => {
-	console.log('-- Server Stats --')
-	const current_time = new Date();
-	console.log(`Server started: ${current_time.getMonth() + 1}(m) ${current_time.getDate()} ${current_time.getFullYear()} ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`);
+app.get('/dev', (req, res) => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err) throw err;
-		console.log(`There are ${Object.keys(JSON.parse(data)).length} user(s) in the DataBase`);
+		if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
+			gobackhome(res);
+			return;
+		}
+		let user = uuids.get(req.cookies.uuid),
+			body = JSON.parse(data);
+		user = body[user.toLowerCase()];
+		let stickies = user.stickies;
+		res.render('development', { stickies: stickies });
 	});
-	if (uuid_gen) {
-		console.log('uuid generator: working 👍');
-	} else {
-		console.log('uuid generator: missing 😕');
-	}
+});
 
+app.listen(3000, () => {
+	console.log('-- Server Stats --');
+	const current_time = new Date();
+	console.log(
+		`Server started: ${
+			current_time.getMonth() + 1
+		}(m) ${current_time.getDate()} ${current_time.getFullYear()} ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`
+	);
+	fs.readFile(__dirname + '/users.json', (err, data) => {
+		if (err) throw err;
+		let users = Object.keys(JSON.parse(data));
+		console.log(`There are ${users.length} user(s) in the DataBase`);
+	});
 	setInterval(() => {
 		uuids.clearAll();
 	}, clear);

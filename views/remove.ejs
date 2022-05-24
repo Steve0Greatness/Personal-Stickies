@@ -19,9 +19,9 @@
 	<form action="/api/remove" method="get">
 		<fieldset>
 			<legend>Remove Topic</legend>
-			<select>
+			<select required name="topicId">
 				<% for (let s of stickies) { %>
-				<option value="<%- s.topic_ID -%>"><%- s.topic_NAME -%> by <%- s.topic_OWNER -%></option>
+				<option <% if (stickies.indexOf(s) === 0) { %><% } %> value="<%- s.topic_ID -%>"><%- s.topic_NAME -%> by <%- s.topic_OWNER -%></option>
 				<% } %>
 			</select>
 			<input type="submit" value="Remove Topic">

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Rearrange</title>
+	<link rel="stylesheet" href="/style.css">
+	<noscript>This page relys on JavaScript.</noscript>
+</head>
+	
+<body>
+	<% for (let i = 0; i < stickies.length; i++) { %>
+	<div class="area" data-index="<%- i -%>"><div class="input" data-input="<%- i -%>" draggable="true"><%- stickies[i].topic_NAME -%> by <%- stickies[i].topic_OWNER -%></div></div>
+	<% } %>
+	<button id="submit">Submit</button>
+	<script src="/reorder.js" onload="fillup(<%- stickies.length -%>)"></script>
+</body>
+	
+</html>
