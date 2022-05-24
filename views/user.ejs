@@ -7,7 +7,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><%- name -%>'(s) Personal Stickies</title>
 	<link rel="stylesheet" href="/style.css">
-	<noscript>You cannot use the button to copy the bb-code with JS turned off.</noscript>
 </head>
 	
 <body>
@@ -15,7 +14,7 @@
 	<nav>
 		<a href="/" class="nav">Back Home</a>
 	</nav>
-	<p id="actions"><button id="bbc_action"><span id="bbc_action_sh">Show</span> BBCode</button></p>
+	<p id="actions"><a class="button" href="/users/<%- name -%>/bbcode">Show BBCode</a></p>
 	<div id="user_info"><a href="//scratch.mit.edu/users/<%- name -%>"><img width="16" height="16" src="//cdn2.scratch.mit.edu/get_image/user/<%- user.user.id -%>_<%- size -%>x<%- size -%>.png"><%- name -%></a></div><div id="user_pins">
 	<main>
 	<% for (let s of user.stickies) { %>
@@ -30,11 +29,6 @@
 		<h1>This User Doesn't Have Any Stickies</h1>
 	<% } %>
 	</main>
-	<dialog open="true" id="bb-code">
-		<button id="copy_button">Copy</button><br>
-		<textarea id="bb-code_area" cols="100" rows="10"><% for (let s of user.stickies) { %>[p][img=https://cdn.scratch.mit.edu/scratchr2/static/__d1ebf404f1417ff16e40f47414e36554__/djangobb_forum/themes/scratch_default_theme_copy/img/icon/sticky.png] Sticky: [url="//scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>"]<%- s.topic_NAME -%>[/url] by <%- s.topic_OWNER -%> [url="//scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>/unread/"](New Posts)[/url][/p]<% } %></textarea>
-	</dialog>
-	<script src="/actions.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+	
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title><%- name -%>'(s) Personal Stickies</title>
+	<link rel="stylesheet" href="/style.css">
+	<noscript>You cannot use the button to copy the bb-code with JS turned off.</noscript>
+</head>
+	
+<body>
+	<h1>User's Stickies</h1>
+	<nav>
+		<a href="/" class="nav">Back Home</a>
+	</nav>
+	<p id="actions"><a class="button" href="./">Hide BBCode</a></p>
+	<div id="user_info"><a href="//scratch.mit.edu/users/<%- name -%>"><img width="16" height="16" src="//cdn2.scratch.mit.edu/get_image/user/<%- user.user.id -%>_<%- size -%>x<%- size -%>.png"><%- name -%></a></div><div id="user_pins">
+	<main>
+	<textarea id="copy" readonly cols="50" rows="10"><% for (let s of user.stickies) { %>[p][img=https://cdn.scratch.mit.edu/scratchr2/static/__d1ebf404f1417ff16e40f47414e36554__/djangobb_forum/themes/scratch_default_theme_copy/img/icon/sticky.png] Sticky: [url=https://scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>]<%- s.topic_NAME -%>[/url] by <%- s.topic_OWNER -%> [url=https://scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>/unread/](New Posts)[/url][/p]<% } %></textarea>
+	<% if (user.stickies.length === 0) { %>
+		<h1>This User Doesn't Have Any Stickies</h1>
+	<% } else { %>
+		<button id="copy_button">Copy BBCode</button> <noscript>For this button to work, JavaScript must be enabled.</noscript>
+		<script>
+			document.querySelector('#copy_button').addEventListener('click', () => {
+				navigator.clipboard.writeText(document.querySelector('copy').value)
+					.catch((err) => {
+						alert('Something happened that prevented the text from being coppied. Try highlighting the text inside the textbox and copying from there instead.');
+					});
+			});
+		</script>
+	<% } %>
+	</main>
+</body>
+
+</html>

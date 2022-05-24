@@ -214,6 +214,29 @@ app.get('/users/:user', (req, res) => {
 	});
 });
 
+app.get('/users/:user/bbcode', (req, res) => {
+	fs.readFile(__dirname + '/users.json', (err, data) => {
+		if (err) {
+			console.error(err);
+			return;
+		}
+		let body = JSON.parse(data),
+			user = req.params.user;
+		if (!(user.toLowerCase() in body)) {
+			res.render('error', {
+				code: 404,
+				msg: 'User Not Found',
+				desc: 'The requested user could not be found by the server.',
+			});
+			return;
+		}
+		user = body[user.toLowerCase()];
+		let name = user.user.name,
+			size = '16';
+		res.render('bbcode', { name: name, user: user, size: size });
+	});
+});
+
 app.get('/all_users', (req, res) => {
 	fs.readFile(__dirname + '/users.json', (err, data) => {
 		if (err) {
