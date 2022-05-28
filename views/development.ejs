@@ -7,10 +7,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Rearrange</title>
 	<link rel="stylesheet" href="/style.css">
-	<noscript>This page relys on JavaScript.</noscript>
+	<noscript>This page requires JavaScript to function.</noscript>
 </head>
 	
 <body>
+	<h1>Rearrange<sup>[INDEV]</sup></h1>
+	<nav>
+		<a href="/" class="nav">Back Home</a>
+		<a class="nav" href="/add">Add a Topic</a>
+		<a class="nav" href="/remove">Remove a Topic</a>
+		<a class="nav" href="/me">My Profile</a>
+	</nav>
 	<% for (let i = 0; i < stickies.length; i++) { %>
 	<div class="area" data-index="<%- i -%>"><div class="input" data-input="<%- i -%>" draggable="true"><%- stickies[i].topic_NAME -%> by <%- stickies[i].topic_OWNER -%></div></div>
 	<% } %>

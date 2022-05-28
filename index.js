@@ -7,7 +7,7 @@ const express = require('express'),
 	fs = require('fs'),
 	cors = require('cors'),
 	uuid_gen = require('uuid-random'),
-	clear = 86400000; /* 24 hours(24 * 60 * 60 * 1000) */
+	clear = 86400000 * 7; /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
 require('ejs');
 
 app.use(cookie_parser());
@@ -339,5 +339,6 @@ app.listen(3000, () => {
 	});
 	setInterval(() => {
 		uuids.clearAll();
+		console.log('=> Clearing UUIDs from the DataBase')
 	}, clear);
 });

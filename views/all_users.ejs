@@ -13,7 +13,7 @@
 	<nav>
 		<a href="/" class="nav">Back Home</a>
 	</nav>
-	<p>These are all the users on this platform</p>
+	<p>These are the <%- Object.keys(body).length -%> users on this platform</p>
 	<ul>
 		<% for (let user in body) { %>
 		<li><a href="/users/<%- body[user].user.name -%>"><%- body[user].user.name -%></a></li>
