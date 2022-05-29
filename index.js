@@ -10,6 +10,8 @@ const express = require('express'),
 	clear = 86400000 * 7; /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
 require('ejs');
 
+var status = "";
+
 app.use(cookie_parser());
 app.use(express.static('static'));
 app.set('view engine', 'ejs');
@@ -52,11 +54,8 @@ app.get('/api/parseURL', (req, res) => {
 });
 
 app.get('/api/add', (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
-		if (err) {
-			console.error(err);
-			return;
-		}
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
+		if (err) throw err;
 		if (
 			uuids.get(req.cookies.uuid) === undefined ||
 			!('uuid' in req.cookies) ||
@@ -95,7 +94,7 @@ app.get('/api/add', (req, res) => {
 								topic_OWNER: b[0].username,
 							});
 							fs.writeFile(
-								__dirname + '/users.json',
+								__dirname + '/users_data.json',
 								JSON.stringify(body),
 								(e) => {
 									if (e) throw e;
@@ -119,7 +118,7 @@ app.get('/api/add', (req, res) => {
 						topic_OWNER: b[0].username,
 					});
 					let write = new Uint8Array(Buffer.from(JSON.stringify(body)));
-					fs.writeFile(__dirname + '/users.json', write, (e) => {
+					fs.writeFile(__dirname + '/users_data.json', write, (e) => {
 						if (e) throw e;
 					});
 					gobackhome(res, 150);
@@ -129,7 +128,7 @@ app.get('/api/add', (req, res) => {
 });
 
 app.get('/api/remove', (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		if (
 			uuids.get(req.cookies.uuid) === undefined || !('uuid' in req.cookies)
@@ -148,14 +147,14 @@ app.get('/api/remove', (req, res) => {
 		body[user.toLowerCase()].stickies = body[
 			user.toLowerCase()
 		].stickies.filter((e) => e.topic_ID !== parseInt(req.query.topicId));
-		fs.writeFile(__dirname + '/users.json', JSON.stringify(body), (err) => {
+		fs.writeFile(__dirname + '/users_data.json', JSON.stringify(body), (err) => {
 			if (err) throw err;
 		});
 		gobackhome(res);
 	});
 });
 
-app.get('/signin', (req, res) => {
+app.get('/signin', (_, res) => {
 	let red = Buffer.from(
 		'https://Personal-Stickies.stevesgreatness.repl.co/api/auth',
 		'utf-8'
@@ -178,7 +177,7 @@ app.get('/remove', (req, res) => {
 		res.clearCookie('uuid');
 		gobackhome(res);
 	}
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		let body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
@@ -192,7 +191,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/users/:user', (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) {
 			console.error(err);
 			return;
@@ -215,7 +214,7 @@ app.get('/users/:user', (req, res) => {
 });
 
 app.get('/users/:user/bbcode', (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) {
 			console.error(err);
 			return;
@@ -238,7 +237,7 @@ app.get('/users/:user/bbcode', (req, res) => {
 });
 
 app.get('/all_users', (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) {
 			throw err;
 		}
@@ -254,7 +253,7 @@ app.get('/api/user_redirect', (req, res) => {
 });
 
 app.get('/api/users/:user', cors(), (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		let body = JSON.parse(data),
 			user = req.params.user;
@@ -272,7 +271,7 @@ app.get('/api/users/:user', cors(), (req, res) => {
 	});
 });
 
-app.get('/credits', (req, res) => {
+app.get('/credits', (_, res) => {
 	fs.readFile(__dirname + '/static/contributers.json', (err, data) => {
 		if (err) throw err;
 		res.render('credits', { body: JSON.parse(data) });
@@ -288,7 +287,7 @@ app.get('/me', (req, res) => {
 });
 
 app.get('/me_embed', (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		let body = JSON.parse(data);
 		if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
@@ -305,12 +304,12 @@ app.get('/me_embed', (req, res) => {
 	});
 });
 
-app.get('/api', (req, res) => {
+app.get('/api', (_, res) => {
 	res.sendFile(__dirname + '/docs.html');
 });
 
 app.get('/dev', (req, res) => {
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
 			gobackhome(res);
@@ -324,21 +323,33 @@ app.get('/dev', (req, res) => {
 	});
 });
 
+app.get('/stats', (_, res) => {
+	res.render('status', { status: status });
+})
+
 app.listen(3000, () => {
 	console.log('-- Server Stats --');
-	const current_time = new Date();
-	console.log(
-		`Server started: ${
+	const current_time = new Date(),
+		parsed_time = `${
 			current_time.getMonth() + 1
-		}(m) ${current_time.getDate()} ${current_time.getFullYear()} ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`
+		}(m) ${current_time.getDate()} ${current_time.getFullYear()} ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`;
+	console.log(
+		`Server started: ${parsed_time}`
 	);
-	fs.readFile(__dirname + '/users.json', (err, data) => {
+	status += `<div class="on_start">Server started: <time>${parsed_time}</time></div>`;
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		let users = Object.keys(JSON.parse(data));
 		console.log(`There are ${users.length} user(s) in the DataBase`);
+		status += `<div class="on_start"><span id="user_ammount">${users.length}</span> user(s)</div>`;
 	});
 	setInterval(() => {
+		let new_time = new Date(),
+			parsed_new = `${
+			new_time.getMonth() + 1
+		}(m) ${new_time.getDate()} ${new_time.getFullYear()} ${new_time.getHours()}:${new_time.getMinutes()}:${new_time.getSeconds()}`;
 		uuids.clearAll();
-		console.log('=> Clearing UUIDs from the DataBase')
+		console.log(`=> Clearing UUIDs from the DataBase at ${parsed_new}`)
+		status += `<div class="uuid_clear">UUIDs cleared at <time>${parsed_new}</time></div>`;
 	}, clear);
 });

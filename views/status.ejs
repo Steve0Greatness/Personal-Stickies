@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+	<title>Server Status</title>
+	<style>
+		:root {
+			font-family: monospace;
+		}
+
+		body {
+			color: limegreen;
+			background-color: black;
+		}
+
+		html {
+			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		
+		.uuid_clear::before {
+			content: "=> ";
+			color: limegreen;
+		}
+
+		.uuid_clear {
+			color: #0a2;
+		}
+	</style>
+</head>
+
+<body>
+	<h1 id="head">Server Stats</h1>
+	<section id="status"><%- status -%></section>
+</body>
+
+</html>
