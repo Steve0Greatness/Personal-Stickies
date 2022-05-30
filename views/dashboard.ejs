@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Add Topic</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+	
+<body>
+	<h1>Dashboard</h1>
+	<nav>
+		<a href="/" class="nav">Back Home</a>
+		<a class="nav" href="/me">My Profile</a>
+	</nav>
+	<div class="tableOfContents">
+		<a href="#my_stickies" class="tocItem">Current Stickies</a>
+		<a href="#add" class="tocItem">Add a Sticky</a>
+		<a href="#remove" class="tocItem">Remove a Sticky</a>
+	</div>
+	<iframe class="me" id="my_stickies" src="/me_embed"></iframe>
+	<h2 id="add">Add a Sticky</h2>
+	<form action="/api/parseURL" method="get">
+		<fieldset>
+			<legend>From URL</legend>
+			<input type="url" required name="url" pattern="https?://scratch\.mit\.edu\/discuss\/topic\/.+">
+			<input type="submit" value="Add From URL">
+			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[5])">Preview</button>
+		</fieldset>
+	</form>
+	<form action="/api/add" method="get">
+		<fieldset>
+			<legend>From Id</legend>
+			<input type="number" required name="topicId">
+			<input type="submit" value="Add From Id">
+			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.toString())">Preview</button>
+		</fieldset>
+	</form>
+	<dialog>
+		<h2>Previewing<button id="close_preview">X</button></h2>
+		<div id="preview"></div>
+	</dialog>
+	<script src="/preview.js"></script>
+	<noscript>Unforchunatly, with JavaScript turned off for this website, you are unable to use the preview feature.</noscript>
+	<h2 id="remove">Remove a Sticky</h2>
+	<form action="/api/remove" method="get">
+		<fieldset>
+			<legend>Remove Topic</legend>
+			<select required name="topicId">
+				<% for (let s of stickies) { %>
+				<option <% if (stickies.indexOf(s) === 0) { %><% } %> value="<%- s.topic_ID -%>"><%- s.topic_NAME -%> by <%- s.topic_OWNER -%></option>
+				<% } %>
+			</select>
+			<input type="submit" value="Remove Topic">
+		</fieldset>
+	</form>
+</body>
+	
+</html>

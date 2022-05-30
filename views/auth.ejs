@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Authentication</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+	
+<body>
+	<h1>Authentication</h1>
+	<nav>
+		<a href="/" class="nav">Back Home</a>
+	</nav>
+	<input type="text" value="<%- code -%>">
+	<p><a href="//scratch.mit.edu/projects/<%- project -%><% if (fullscreen) { %>/fullscreen<% } %>" target="_blank" class="button">Open Authentication Project</a></p>
+	<form action="/auth/finish">
+		<input type="text" style="display:none" value="<%- private -%>" name="c" readonly>
+		<input type="checkbox" id="save" name="save" checked> <label for="save">Allow with Oneclick Signin?</label><br>
+		<input type="submit" id="finish" value="Finish Login">
+	</form>
+	<script>
+		const finish = document.querySelector('#finish');
+		finish.value = `Ready`;
+		document.querySelector('button').addEventListener('click', () => {
+			finish.value = 'Finish Login';
+		});
+	</script>
+</body>
+	
+</html>

@@ -12,11 +12,10 @@
 <body>
 	<h1>Personal Stickies</h1>
 	<% if (!bool) { %>
-	<a class="account" href="/signin">Login</a>
+	<a class="account" href="/auth">Login</a>
 	<% } else { %>
 	<nav>
-		<a class="nav" href="/add">Add Stickies</a>
-		<a class="nav" href="/remove">Remove Sticky</a>
+		<a class="nav" href="/dashboard">Dashboard</a>
 		<a class="nav" href="/me">My Profile</a>
 	</nav>
 	<a class="account" href="/logout">Logout</a>

@@ -20,7 +20,11 @@
 	<main>
 	<textarea id="copy" readonly cols="50" rows="10"><% for (let s of user.stickies) { %>[p][img=https://cdn.scratch.mit.edu/scratchr2/static/__d1ebf404f1417ff16e40f47414e36554__/djangobb_forum/themes/scratch_default_theme_copy/img/icon/sticky.png] Sticky: [url=https://scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>]<%- s.topic_NAME -%>[/url] by <%- s.topic_OWNER -%> [url=https://scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>/unread/](New Posts)[/url][/p]<% } %></textarea>
 	<% if (user.stickies.length === 0) { %>
+		<% if (error) { %>
+		<h1>This User Hasn't Used Personal Stickies</h1>
+		<% } else { %>
 		<h1>This User Doesn't Have Any Stickies</h1>
+		<% } %>
 	<% } else { %>
 		<button id="copy_button">Copy BBCode</button> <noscript>For this button to work, JavaScript must be enabled.</noscript>
 		<script>

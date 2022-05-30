@@ -25,6 +25,8 @@ function gobackhome(res, time = 150) {
 }
 
 app.get('/api/auth', (req, res) => {
+	if (!('privateCode' in req.query))
+		return gobackhome(res);
 	fetch(
 		`https://auth.itinerary.eu.org/api/auth/verifyToken?privateCode=${req.query.privateCode}`
 	)
@@ -199,17 +201,30 @@ app.get('/users/:user', (req, res) => {
 		let body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
-			res.render('error', {
-				code: 404,
-				msg: 'User Not Found',
-				desc: 'The requested user could not be found by the server.',
-			});
+			fetch(`https://api.scratch.mit.edu/users/${user}`)
+				.then(e => e.json())
+				.then(e => {
+					res.render('user', {
+						user: { user: { id: e.id }, stickies: [] },
+						name: e.username,
+						size: 16,
+						error: true,
+					});
+				})
+				.catch(err => {
+					console.log(err);
+					res.render('error', {
+						code: 404,
+						msg: 'User Not Found',
+						desc: 'The requested user could not be found by the server.',
+					});
+				})
 			return;
 		}
 		user = body[user.toLowerCase()];
 		let name = user.user.name,
 			size = '16';
-		res.render('user', { name: name, user: user, size: size });
+		res.render('user', { name: name, user: user, size: size, error: false, });
 	});
 });
 
@@ -222,17 +237,30 @@ app.get('/users/:user/bbcode', (req, res) => {
 		let body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
-			res.render('error', {
-				code: 404,
-				msg: 'User Not Found',
-				desc: 'The requested user could not be found by the server.',
-			});
+			fetch(`https://api.scratch.mit.edu/users/${user}`)
+				.then(e => e.json())
+				.then(e => {
+					res.render('bbcode', {
+						user: { user: { id: e.id }, stickies: [] },
+						name: e.username,
+						size: 16,
+						error: true,
+					});
+				})
+				.catch(err => {
+					console.log(err);
+					res.render('error', {
+						code: 404,
+						msg: 'User Not Found',
+						desc: 'The requested user could not be found by the server.',
+					});
+				})
 			return;
 		}
 		user = body[user.toLowerCase()];
 		let name = user.user.name,
 			size = '16';
-		res.render('bbcode', { name: name, user: user, size: size });
+		res.render('bbcode', { name: name, user: user, size: size, error: false, });
 	});
 });
 
@@ -325,6 +353,97 @@ app.get('/dev', (req, res) => {
 
 app.get('/stats', (_, res) => {
 	res.render('status', { status: status });
+})
+
+app.get('/auth/', (req, res) => {
+	res.render('auth_home', { saved: 'saved' in req.cookies })
+})
+
+app.get('/auth/login', (req, res) => {
+	// methods: 0 = cloud, 1 = comment
+	let method = req.query.method;
+	if (!('method' in req.query) && (method !== 0 || method !== 1))
+		return gobackhome(res);
+	fetch(`https://auth-api.itinerary.eu.org/auth/getTokens?redirect=${encodeURIComponent(Buffer.from('personal-stickies.stevesgreatness.repl.co', 'utf-8').toString('base64'))}&method=${method}`)
+		.then(e => e.json())
+		.then(e => {
+			res.render('auth', {
+				code: e.publicCode,
+				project: e.authProject,
+				private: e.privateCode,
+				fullscreen: method === 0
+			})
+		})
+})
+
+app.get('/auth/finish', (req, res) => {
+	if (!('c' in req.query))
+		return gobackhome(res);
+	let save = 'save' in req.query && req.query.save == 'on'
+	fetch(`https://auth-api.itinerary.eu.org/auth/verifyToken/${req.query.c}?redirect=${encodeURIComponent(Buffer.from('personal-stickies.stevesgreatness.repl.co', 'utf-8').toString('base64'))}&oneClickSignIn=${save}`)
+		.then(e => e.json())
+		.then(e => {
+			if (!e.valid) {
+				console.log('invalid.')
+				return gobackhome(res);
+			}
+			let uuid = uuid_gen();
+			uuids.set(uuid, e.username);
+			res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
+			if (save) {
+				let token = e.oneClickSignInToken,
+					month = 31 * 24 * 60 * 60 * 1000,
+					saved = req.cookies.saved || [];
+					saved.push({ token: token, user: e.username });
+					res.cookie('saved', saved, { maxAge: month });
+			}
+			gobackhome(res);
+		})
+})
+
+app.get('/auth/oneclick/', (req, res) => {
+	if (!('saved' in req.cookies))
+		res.render('error', {
+			code: 400,
+			msg: "Nothing Saved",
+			desc: 'You may need to log in the old fashioned way'
+		})
+	res.render('oneclick', { tokens: req.cookies.saved })
+})
+
+app.get('/auth/oneclick/finally', (req, res) => {
+	if (
+		!('saved' in req.cookies) ||
+		!('index' in req.query) ||
+		req.cookies.saved.length < parseInt(req.query.index) + 1
+	)
+		return gobackhome(res);
+	fetch(`https://auth-api.itinerary.eu.org/auth/oneClickSignIn`, {
+		headers: {
+			Authorization: req.cookies.saved[parseInt(req.query.index)].token
+		}
+	})
+		.then(e => e.json())
+		.then(e => {
+			let uuid = uuid_gen();
+			uuids.set(uuid, e[0].username);
+			res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
+			gobackhome(res);
+		})
+})
+
+app.get('/dashboard', (req, res) => {
+	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
+		gobackhome(res);
+		return;
+	}
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
+		if (err) throw err;
+		let body = JSON.parse(data),
+			user = uuids.get(req.cookies.uuid);
+		stickies = body[user.toLowerCase()].stickies;
+		setTimeout(() => res.render('dashboard', { stickies: stickies }), 1000);
+	});
 })
 
 app.listen(3000, () => {

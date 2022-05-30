@@ -30,6 +30,37 @@ input[type="submit"],
 	transition: all 0.2s;
 }
 
+@media screen and (max-device-width: 640px) {
+	button,
+	input[type="submit"],
+	:any-link {
+		font-size: calc(5vw - .1rem);
+		word-wrap: inherit;
+		margin-top: 5px;
+		display: inline-block;
+	}
+
+	input:not([type="submit"]):focus,
+	select:focus-within,
+	textarea:focus {
+		font-size: 1.25rem;
+	}
+
+	input:not([type="submit"]),
+	select,
+	textarea {
+		font-size: 1rem;
+	}
+
+	.snippet {
+		tab-size: 2;
+	}
+
+	textarea {
+		max-width: 100%;
+	}
+}
+
 :any-link.account:hover,
 button:hover,
 input[type="submit"]:hover,
@@ -162,4 +193,15 @@ code.snippet {
 #bb-code {
 	margin-top: 1rem;
 	padding: 15px;
+}
+
+.tableOfContents {
+	background-color: #0001;
+	padding: 5px;
+}
+
+.tocItem {
+	text-decoration: none;
+	color: #900;
+	display: block;
 }
