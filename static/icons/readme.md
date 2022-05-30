@@ -1,4 +1,6 @@
 # Why is this allowed to be here?
+Neither of the 2 images here are under the licence that the rest of this repository is.
+
 ## GitHub
 GitHub allows the use of their logo as long as it fits [these rules on usage of their logo(s)](https://github.com/logos). The usage falls under the second thing that you're allowed to do:
 
