@@ -1,4 +1,4 @@
-@import url(https://rsms.me/inter/inter.css);
+@import url(rsms.me/inter.css);
 
 :root {
 	--logos_size: 16px;
@@ -11,6 +11,12 @@ body {
 	max-width: 50rem;
 	margin: 0 auto;
 	padding: 3rem 2rem;
+}
+
+@supports (font-variation-settings: normal) {
+  body {
+		font-family: 'Inter var', sans-serif;
+	}
 }
 
 :any-link.account,
