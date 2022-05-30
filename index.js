@@ -211,8 +211,7 @@ app.get('/users/:user', (req, res) => {
 						error: true,
 					});
 				})
-				.catch(err => {
-					console.log(err);
+				.catch(_ => {
 					res.render('error', {
 						code: 404,
 						msg: 'User Not Found',
@@ -247,8 +246,7 @@ app.get('/users/:user/bbcode', (req, res) => {
 						error: true,
 					});
 				})
-				.catch(err => {
-					console.log(err);
+				.catch(_ => {
 					res.render('error', {
 						code: 404,
 						msg: 'User Not Found',

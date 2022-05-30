@@ -164,7 +164,7 @@ code.snippet {
 	padding-left: var(--logos_space);
 	background: url("/icons/scratch.png") var(--logos_options);
 	background-size: var(--logos_size);
-	filter: grayscale(100%);
+	filter: brightness(0%);
 }
 
 :any-link.their_stickies::before {

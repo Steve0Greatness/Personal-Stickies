@@ -30,5 +30,19 @@
 				"emoji": "✨"
 			}
 		]
+	},
+	{
+		"names": {
+			"scratch": "MagicCrayon9342",
+			"github": "JaydenDev",
+			"shown": "MagicCrayon9342"
+		},
+		"inDB": true,
+		"roles": [
+			{
+				"name": "ideas",
+				"emoji": "💡"
+			}
+		]
 	}
 ]
