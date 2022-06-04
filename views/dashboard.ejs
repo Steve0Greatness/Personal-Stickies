@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Add Topic</title>
+	<title>Dashboard</title>
 	<link rel="stylesheet" href="/style.css">
 </head>
 	
@@ -19,6 +19,8 @@
 		<a href="#my_stickies" class="tocItem">Current Stickies</a>
 		<a href="#add" class="tocItem">Add a Sticky</a>
 		<a href="#remove" class="tocItem">Remove a Sticky</a>
+		<a href="#rearrange" class="tocItem">Rearrange Stickies</a>
+		<a href="#bbcode" class="tocItem">My BBCode</a>
 	</div>
 	<iframe class="me" id="my_stickies" src="/me_embed"></iframe>
 	<h2 id="add">Add a Sticky</h2>
@@ -27,7 +29,7 @@
 			<legend>From URL</legend>
 			<input type="url" required name="url" pattern="https?://scratch\.mit\.edu\/discuss\/topic\/.+">
 			<input type="submit" value="Add From URL">
-			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[5])">Preview</button>
+			<button class="preview" id="fromUrlPre" type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[5])">Preview</button>
 		</fieldset>
 	</form>
 	<form action="/api/add" method="get">
@@ -35,11 +37,12 @@
 			<legend>From Id</legend>
 			<input type="number" required name="topicId">
 			<input type="submit" value="Add From Id">
-			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.toString())">Preview</button>
+			<button class="preview" id="fromIdPre" type="button" onclick="preview(this.parentElement.querySelector('input').value.toString())">Preview</button>
 		</fieldset>
 	</form>
 	<dialog>
-		<h2>Previewing<button id="close_preview">X</button></h2>
+		<button id="close_preview">X</button>
+		<h2>Previewing</h2>
 		<div id="preview"></div>
 	</dialog>
 	<script src="/preview.js"></script>
@@ -56,6 +59,18 @@
 			<input type="submit" value="Remove Topic">
 		</fieldset>
 	</form>
+	<h2 id="rearrange">Rearrange</h2>
+	<p>Notice: This feature is still buggy. If you have anything to report, post it on <a href="https://scratch.mit.edu/discuss/topic/604367/">the official topic</a>.</p>
+	<% for (let i = 0; i < stickies.length; i++) { %>
+	<div class="area" data-index="<%- i -%>"><div class="input" data-input="<%- i -%>" draggable="true"><%- stickies[i].topic_NAME -%> by <%- stickies[i].topic_OWNER -%></div></div>
+	<% } %>
+	<button id="submit">Submit</button>
+	<noscript>Rearranging your stickies relies on JavaScript.</noscript>
+	<script src="/reorder.js" onload="fillup(<%- stickies.length -%>)"></script>
+	<h2 id="bbcode">BBCode</h2>
+	<textarea id="copy" readonly cols="50" rows="10"><% for (let s of stickies) { %>[p][img=https://cdn.scratch.mit.edu/scratchr2/static/__d1ebf404f1417ff16e40f47414e36554__/djangobb_forum/themes/scratch_default_theme_copy/img/icon/sticky.png] Sticky: [url=https://scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>]<%- s.topic_NAME -%>[/url] by <%- s.topic_OWNER -%> [url=https://scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>/unread/](New Posts)[/url][/p]<% } %></textarea>
+	<button id="copy_button">Copy BBCode</button> <noscript>For this button to work, JavaScript must be enabled.</noscript>
+	<script src="/copy.js"></script>
 </body>
 	
 </html>

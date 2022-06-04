@@ -14,8 +14,15 @@
 	<nav>
 		<a href="/" class="nav">Back Home</a>
 	</nav>
-	<a href="/auth/login?method=1" class="button">Cloud Data(recommended)</a>
-	<a href="/auth/login?method=0" class="button">Comment</a>
+	<p>Due to Scratch Team censoring Scratch Auth, it is now impossible to login if you haven't turned on one click signin. This is on the Scratch Team for entirely removing the capabilty of this site.</p>
+	<img src="https://u.cubeupload.com/Steve_Greatness/unbanscratchauth.png">
+	<form action="/auth/login">
+		<select name="method">
+			<option value="cloud" selected>Cloud</option>
+			<option value="comment">Comment</option>
+		</select>
+		<input type="submit" value="Use Method">
+	</form>
 	<p><a href="/signin" class="button">Use Scratch Auth Directly</a> <% if (saved) { %><a href="/auth/oneclick" class="button">Oneclick Signin</a><% } %></p>
 </body>
 	

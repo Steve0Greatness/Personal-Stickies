@@ -6,7 +6,12 @@ const express = require('express'),
 		import('node-fetch').then(({ default: fetch }) => fetch(...args)),
 	fs = require('fs'),
 	cors = require('cors'),
-	uuid_gen = require('uuid-random'),
+	uuid_gen = ((sections = 5, chars_per_sec = 8) =>
+      (
+        new Array(sections).fill(
+          new Array(chars_per_sec).fill("x").join("")).join("-")
+      ).replace(/x/g, () => Math.floor(Math.random() * 64).toString(36)
+  	)),
 	clear = 86400000 * 7; /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
 require('ejs');
 
@@ -20,8 +25,8 @@ app.use(async (req, res, next) => {
 	setTimeout(next, 150);
 });
 
-function gobackhome(res, time = 150) {
-	setTimeout(() => res.redirect('/'), time);
+function gobackhome(res, url = '/', time = 150) {
+	setTimeout(() => res.redirect(url), time);
 }
 
 app.get('/api/auth', (req, res) => {
@@ -74,10 +79,12 @@ app.get('/api/add', (req, res) => {
 				current_time.getMonth() + 1
 			} ${current_time.getDate()}, ${current_time.getFullYear()}, ${current_time.getHours()}:${current_time.getMinutes()}:${current_time.getSeconds()}`
 		);
+		let timeout = 0;
 		if (!(user.toLowerCase() in body)) {
+			timeout = 1500
 			fetch(`https://scratchdb.lefty.one/v3/user/info/${user}`)
-				.then((s) => s.json())
-				.then((d) => {
+				.then(s => s.json())
+				.then(d => {
 					body[user.toLowerCase()] = {
 						user: {
 							id: d.id,
@@ -85,32 +92,14 @@ app.get('/api/add', (req, res) => {
 						},
 						stickies: [],
 					};
-					fetch(
-						`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`
-					)
-						.then((s) => s.json())
-						.then((b) => {
-							body[user.toLowerCase()].stickies.push({
-								topic_ID: b[0].topic.id,
-								topic_NAME: b[0].topic.title,
-								topic_OWNER: b[0].username,
-							});
-							fs.writeFile(
-								__dirname + '/users_data.json',
-								JSON.stringify(body),
-								(e) => {
-									if (e) throw e;
-								}
-							);
-							gobackhome(res, 150);
-						});
 				});
-		} else {
+		}
+		setTimeout(() => {
 			fetch(
 				`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`
 			)
-				.then((s) => s.json())
-				.then((b) => {
+				.then(s => s.json())
+				.then(b => {
 					body[user.toLowerCase()].stickies = body[
 						user.toLowerCase()
 					].stickies.filter((s) => s.topic_ID !== b[0].topic.id);
@@ -123,9 +112,9 @@ app.get('/api/add', (req, res) => {
 					fs.writeFile(__dirname + '/users_data.json', write, (e) => {
 						if (e) throw e;
 					});
-					gobackhome(res, 150);
-				});
-		}
+					gobackhome(res, '/dashboard');
+				})
+		}, timeout)
 	});
 });
 
@@ -152,7 +141,7 @@ app.get('/api/remove', (req, res) => {
 		fs.writeFile(__dirname + '/users_data.json', JSON.stringify(body), (err) => {
 			if (err) throw err;
 		});
-		gobackhome(res);
+		gobackhome(res, '/dashboard');
 	});
 });
 
@@ -229,10 +218,7 @@ app.get('/users/:user', (req, res) => {
 
 app.get('/users/:user/bbcode', (req, res) => {
 	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) {
-			console.error(err);
-			return;
-		}
+		if (err) throw err;
 		let body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
@@ -334,7 +320,7 @@ app.get('/api', (_, res) => {
 	res.sendFile(__dirname + '/docs.html');
 });
 
-app.get('/dev', (req, res) => {
+app.get('/rearrange', (req, res) => {
 	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
@@ -345,7 +331,34 @@ app.get('/dev', (req, res) => {
 			body = JSON.parse(data);
 		user = body[user.toLowerCase()];
 		let stickies = user.stickies;
-		res.render('development', { stickies: stickies });
+		res.render('rearrange', { stickies: stickies });
+	});
+});
+
+app.get('/api/rearrange', (req, res) => {
+	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined || !('indexes' in req.query)) {
+		gobackhome(res);
+		return;
+	}
+	fs.readFile(__dirname + '/users_data.json', (err, data) => {
+		if (err) throw err;
+		let user = uuids.get(req.cookies.uuid),
+			body = JSON.parse(data),
+			indexes = req.query.indexes.split(',');
+		user = body[user.toLowerCase()];
+		let stickies = (user.stickies),
+			final = [];
+		for (let i = 0; i < stickies.length; i++) {
+			let index = parseInt(indexes[i]);
+			final.push(stickies[index]);
+		}
+		setTimeout(() => {
+			body[user.user.name.toLowerCase()].stickies = final;
+			fs.writeFile(__dirname + '/users_data.json', JSON.stringify(body), (e) => {
+				if (e) throw e;
+			});
+			gobackhome(res, '/dashboard');
+		}, 1000)
 	});
 });
 
@@ -375,8 +388,10 @@ app.get('/auth/login', (req, res) => {
 })
 
 app.get('/auth/finish', (req, res) => {
-	if (!('c' in req.query))
+	if (!('c' in req.query)) {
+		console.log("No Code ☹️")
 		return gobackhome(res);
+	}
 	let save = 'save' in req.query && req.query.save == 'on'
 	fetch(`https://auth-api.itinerary.eu.org/auth/verifyToken/${req.query.c}?redirect=${encodeURIComponent(Buffer.from('personal-stickies.stevesgreatness.repl.co', 'utf-8').toString('base64'))}&oneClickSignIn=${save}`)
 		.then(e => e.json())
@@ -390,12 +405,12 @@ app.get('/auth/finish', (req, res) => {
 			res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
 			if (save) {
 				let token = e.oneClickSignInToken,
-					month = 31 * 24 * 60 * 60 * 1000,
+					month = 5 * 31 * 24 * 60 * 60 * 1000,
 					saved = req.cookies.saved || [];
 					saved.push({ token: token, user: e.username });
 					res.cookie('saved', saved, { maxAge: month });
 			}
-			gobackhome(res);
+			gobackhome(res, '/dashboard');
 		})
 })
 
@@ -426,7 +441,7 @@ app.get('/auth/oneclick/finally', (req, res) => {
 			let uuid = uuid_gen();
 			uuids.set(uuid, e[0].username);
 			res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
-			gobackhome(res);
+			gobackhome(res, '/dashboard');
 		})
 })
 
@@ -439,7 +454,7 @@ app.get('/dashboard', (req, res) => {
 		if (err) throw err;
 		let body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
-		stickies = body[user.toLowerCase()].stickies;
+		stickies = (body[user.toLowerCase()] || { stickies: [] }).stickies;
 		setTimeout(() => res.render('dashboard', { stickies: stickies }), 1000);
 	});
 })
