@@ -15,15 +15,14 @@
 		<a href="/" class="nav">Back Home</a>
 	</nav>
 	<p>Due to Scratch Team censoring Scratch Auth, it is now impossible to login if you haven't turned on one click signin. This is on the Scratch Team for entirely removing the capabilty of this site.</p>
-	<img src="https://u.cubeupload.com/Steve_Greatness/unbanscratchauth.png">
 	<form action="/auth/login">
-		<select name="method">
+		<select name="method" disabled>
 			<option value="cloud" selected>Cloud</option>
 			<option value="comment">Comment</option>
 		</select>
-		<input type="submit" value="Use Method">
+		<input type="submit" disabled value="Use Method">
 	</form>
-	<p><a href="/signin" class="button">Use Scratch Auth Directly</a> <% if (saved) { %><a href="/auth/oneclick" class="button">Oneclick Signin</a><% } %></p>
+	<p><a href="/signin" class="button">Use Scratch Auth Directly</a> <a href="/auth/profile" class="button">Profile Login</a> <% if (saved) { %><a href="/auth/oneclick" class="button">Oneclick Signin</a><% } %></p>
 </body>
 	
 </html>

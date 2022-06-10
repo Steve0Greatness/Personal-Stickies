@@ -6,13 +6,15 @@ const express = require('express'),
 		import('node-fetch').then(({ default: fetch }) => fetch(...args)),
 	fs = require('fs'),
 	cors = require('cors'),
-	uuid_gen = ((sections = 5, chars_per_sec = 8) =>
-      (
-        new Array(sections).fill(
-          new Array(chars_per_sec).fill("x").join("")).join("-")
-      ).replace(/x/g, () => Math.floor(Math.random() * 64).toString(36)
-  	)),
-	clear = 86400000 * 7; /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
+	uuid_gen = (sections = 5, chars_per_sec = 4, init_end = 6) =>
+		`${new Array(init_end).fill("x").join("")}-${
+			new Array(sections).fill(
+				new Array(chars_per_sec).fill("x").join("")
+			).join("-")
+		}-${new Array(init_end).fill("x").join("")}`
+			.replace(/x/g, () => Math.floor(Math.random() * 64).toString(36)),
+	clear = 86400000 * 7, /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
+	dom = require('jsdom');
 require('ejs');
 
 var status = "";
@@ -178,7 +180,7 @@ app.get('/remove', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-	setTimeout(() => res.render(`index`, { bool: 'uuid' in req.cookies }), 1000);
+	setTimeout(() => res.render(`index`, { bool: 'uuid' in req.cookies, del: 'delete_comment' in req.query }), 1000);
 });
 
 app.get('/users/:user', (req, res) => {
@@ -389,7 +391,6 @@ app.get('/auth/login', (req, res) => {
 
 app.get('/auth/finish', (req, res) => {
 	if (!('c' in req.query)) {
-		console.log("No Code ☹️")
 		return gobackhome(res);
 	}
 	let save = 'save' in req.query && req.query.save == 'on'
@@ -397,7 +398,6 @@ app.get('/auth/finish', (req, res) => {
 		.then(e => e.json())
 		.then(e => {
 			if (!e.valid) {
-				console.log('invalid.')
 				return gobackhome(res);
 			}
 			let uuid = uuid_gen();
@@ -457,6 +457,44 @@ app.get('/dashboard', (req, res) => {
 		stickies = (body[user.toLowerCase()] || { stickies: [] }).stickies;
 		setTimeout(() => res.render('dashboard', { stickies: stickies }), 1000);
 	});
+})
+
+app.get('/auth/profile', (req, res) => {
+	res.sendFile(__dirname + '/profile_auth.html')
+})
+
+app.get('/auth/profile/code', (req, res) => {
+	if (!('user' in req.query))
+		return gobackhome(res);
+	res.render('profile_code', {
+		user: req.query.user,
+		code: new Array(8).fill('x').join('').replace(
+			/x/g,
+			function() {
+				return Math.floor(Math.random() * 64).toString(32);
+			}
+		)
+	});
+})
+
+app.get('/auth/profile/final', (req, res) => {
+	if (!('user' in req.query || 'code' in req.query))
+		return gobackhome(res);
+	fetch(`https://scratch-comments.stevesgreatness.repl.co/users/${req.query.user}`)
+		.then(e => e.json())
+		.then(e => {
+			for (let i = 0; i < e.length; i++) {
+				let a = e[i];
+				if (a.reply) continue;
+				if (a.author === req.query.user && a.content.includes(req.query.code)) {
+					let uuid = uuid_gen();
+					uuids.set(uuid, a.author);
+					res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
+					setTimeout(() => {gobackhome(res, '/?delete_comment=1')}, 1000)
+					break;
+				}
+			}
+		})
 })
 
 app.listen(3000, () => {

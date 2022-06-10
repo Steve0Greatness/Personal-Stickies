@@ -67,11 +67,15 @@ input[type="submit"],
 	}
 }
 
-:any-link.account:hover,
-button:hover,
-input[type="submit"]:hover,
-:any-link.button:hover {
+:any-link.account:hover:not([disabled]),
+button:hover:not([disabled]),
+input[type="submit"]:hover:not([disabled]),
+:any-link.button:hover:not([disabled]) {
 	background: #ccc;
+}
+
+[disabled] {
+	cursor: no-drop !important;
 }
 
 :any-link.account,

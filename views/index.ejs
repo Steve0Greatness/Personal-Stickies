@@ -11,6 +11,9 @@
 
 <body>
 	<h1>Personal Stickies</h1>
+	<% if (del) { %>
+		<p class="notice">Friendly reminder to delete the comment that you just posted on your profile.</p>
+	<% } %>
 	<% if (!bool) { %>
 	<a class="account" href="/auth">Login</a>
 	<% } else { %>
