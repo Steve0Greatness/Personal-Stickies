@@ -13,8 +13,7 @@ const express = require('express'),
 			).join("-")
 		}-${new Array(init_end).fill("x").join("")}`
 			.replace(/x/g, () => Math.floor(Math.random() * 64).toString(36)),
-	clear = 86400000 * 7, /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
-	dom = require('jsdom');
+	clear = 86400000 * 7; /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
 require('ejs');
 
 var status = "";
@@ -373,16 +372,17 @@ app.get('/auth/', (req, res) => {
 })
 
 app.get('/auth/login', (req, res) => {
-	// methods: 0 = cloud, 1 = comment
+	// methods: 0 = cloud, 1 = comment, 3 = profile-comment
 	let method = req.query.method;
-	if (!('method' in req.query) && (method !== 0 || method !== 1))
+	if (!('method' in req.query) && !(method < 0 || method > 2))
 		return gobackhome(res);
-	fetch(`https://auth-api.itinerary.eu.org/auth/getTokens?redirect=${encodeURIComponent(Buffer.from('personal-stickies.stevesgreatness.repl.co', 'utf-8').toString('base64'))}&method=${method}`)
+	fetch(`https://auth-api.itinerary.eu.org/auth/getTokens?redirect=${encodeURIComponent(Buffer.from('personal-stickies.stevesgreatness.repl.co', 'utf-8').toString('base64'))}&method=${method}${'user' in req.query ? `&username=${req.query.user}`: ''}`)
 		.then(e => e.json())
 		.then(e => {
 			res.render('auth', {
 				code: e.publicCode,
-				project: e.authProject,
+				authLoc: e.authProject || e.username,
+				isuser: 'username' in e,
 				private: e.privateCode,
 				fullscreen: method === 0
 			})
@@ -461,40 +461,6 @@ app.get('/dashboard', (req, res) => {
 
 app.get('/auth/profile', (req, res) => {
 	res.sendFile(__dirname + '/profile_auth.html')
-})
-
-app.get('/auth/profile/code', (req, res) => {
-	if (!('user' in req.query))
-		return gobackhome(res);
-	res.render('profile_code', {
-		user: req.query.user,
-		code: new Array(8).fill('x').join('').replace(
-			/x/g,
-			function() {
-				return Math.floor(Math.random() * 64).toString(32);
-			}
-		)
-	});
-})
-
-app.get('/auth/profile/final', (req, res) => {
-	if (!('user' in req.query || 'code' in req.query))
-		return gobackhome(res);
-	fetch(`https://scratch-comments.stevesgreatness.repl.co/users/${req.query.user}`)
-		.then(e => e.json())
-		.then(e => {
-			for (let i = 0; i < e.length; i++) {
-				let a = e[i];
-				if (a.reply) continue;
-				if (a.author === req.query.user && a.content.includes(req.query.code)) {
-					let uuid = uuid_gen();
-					uuids.set(uuid, a.author);
-					res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
-					setTimeout(() => {gobackhome(res, '/?delete_comment=1')}, 1000)
-					break;
-				}
-			}
-		})
 })
 
 app.listen(3000, () => {

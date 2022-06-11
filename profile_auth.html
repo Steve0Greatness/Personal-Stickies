@@ -11,7 +11,8 @@
 	
 <body>
 	<h1>Authentication</h1>
-	<form action="/auth/profile/code">
+	<form action="/auth/login">
+		<input type="text" name="method" style="display:none" value="profile-comment">
 		<input type="text" name="user" placeholder="Username" required>
 		<p><input type="submit" value="Get Code"></p>
 	</form>

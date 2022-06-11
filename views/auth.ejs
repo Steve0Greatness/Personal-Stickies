@@ -15,7 +15,9 @@
 		<a href="/" class="nav">Back Home</a>
 	</nav>
 	<input type="text" value="<%- code -%>">
-	<p><a href="//scratch.mit.edu/projects/<%- project -%><% if (fullscreen) { %>/fullscreen<% } %>" target="_blank" class="button">Open Authentication Project</a></p>
+	<p>
+		<a href="//scratch.mit.edu/<%- isuser ? 'user' : 'project' -%>s/<%- authLoc -%>/<%- fullscreen ? 'fullscreen' : (isuser ? '#comments' : '') -%>" target="_blank" class="button">Open <%- isuser ? 'Profile' : 'Authentication Project' -%></a>
+	</p>
 	<form action="/auth/finish">
 		<input type="text" style="display:none" value="<%- private -%>" name="c" readonly>
 		<input type="checkbox" id="save" name="save" checked> <label for="save">Allow with Oneclick Signin?</label><br>
