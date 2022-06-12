@@ -185,8 +185,7 @@ app.get('/', (req, res) => {
 app.get('/users/:user', (req, res) => {
 	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) {
-			console.error(err);
-			return;
+			throw err;
 		}
 		let body = JSON.parse(data),
 			user = req.params.user;
@@ -198,7 +197,6 @@ app.get('/users/:user', (req, res) => {
 						user: { user: { id: e.id }, stickies: [] },
 						name: e.username,
 						size: 16,
-						error: true,
 					});
 				})
 				.catch(_ => {
@@ -213,7 +211,7 @@ app.get('/users/:user', (req, res) => {
 		user = body[user.toLowerCase()];
 		let name = user.user.name,
 			size = '16';
-		res.render('user', { name: name, user: user, size: size, error: false, });
+		res.render('user', { name: name, user: user, size: size, });
 	});
 });
 
@@ -230,9 +228,7 @@ app.get('/users/:user/bbcode', (req, res) => {
 						user: { user: { id: e.id }, stickies: [] },
 						name: e.username,
 						size: 16,
-						error: true,
-					});
-				})
+					});				})
 				.catch(_ => {
 					res.render('error', {
 						code: 404,
@@ -245,7 +241,7 @@ app.get('/users/:user/bbcode', (req, res) => {
 		user = body[user.toLowerCase()];
 		let name = user.user.name,
 			size = '16';
-		res.render('bbcode', { name: name, user: user, size: size, error: false, });
+		res.render('bbcode', { name: name, user: user, size: size, });
 	});
 });
 
