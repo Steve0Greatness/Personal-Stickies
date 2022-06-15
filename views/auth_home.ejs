@@ -15,10 +15,12 @@
 		<a href="/" class="nav">Back Home</a>
 	</nav>
 	<form action="/auth/login">
-		<select name="method">
-			<option value="cloud" selected>Cloud</option>
-			<option value="comment">Comment</option>
+		<p>These methods are not currently functional, due to Scratch Auth's project being taken down.</p>
+		<select name="method" id="method">
+			<option value="cloud" selected>☁️ Cloud</option>
+			<option value="comment">💬 Comment</option>
 		</select>
+		<label for="method">Method for Logging in</label><br>
 		<input type="submit" value="Use Method">
 	</form>
 	<p><a href="/signin" class="button">Use Scratch Auth Directly</a> <a href="/auth/profile" class="button">Profile Login</a> <% if (saved) { %><a href="/auth/oneclick" class="button">Oneclick Signin</a><% } %></p>
