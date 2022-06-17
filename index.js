@@ -42,7 +42,7 @@ function gobackhome(res, url = '/', time = 150) {
 }
 
 app.get('/theme_change', (req, res) => {
-	if (!('theme' in req.cookies) || !themes.includes(req.cookies.theme) || themes.indexOf(req.cookies.theme) >= themes.length) {
+	if (!('theme' in req.cookies) || !themes.includes(req.cookies.theme) || themes.indexOf(req.cookies.theme) + 1 >= themes.length) {
 		res.cookie('theme', themes[0], { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
 		return gobackhome(res);
 	}
@@ -479,7 +479,7 @@ app.get('/dashboard', (req, res) => {
 		let body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
 		stickies = (body[user.toLowerCase()] || { stickies: [] }).stickies;
-		setTimeout(() => res.render('dashboard', { stickies: stickies }), 1000);
+		setTimeout(() => res.render('dashboard', { stickies: stickies, theme: req.cookies.theme || themes[0] }), 1000);
 	});
 })
 

@@ -1,9 +1,69 @@
 @import url(inter/inter.css);
 
+html.light {
+	color: #000;
+	background: #fff;
+	--credits: brightness(0);
+	--link: #1f1ffa;
+	--link-active: #ef5a5a;
+	--link-visited: #de12ef;
+	--button-background: #ddd;
+	--button-color: black;
+	--button-background-hover: #ccc;
+	--input-background: white;
+	--input-color: #001;
+	--input-border: #ccc;
+	--nav-color: purple;
+	--preview-color: black;
+	--code-background: #eee;
+	--code-color: black;
+	--area-background: #eee;
+	--i-background: #fff;
+	--i-border: #000;
+	--toc-background: #0001;
+	--toc-item: #900;
+}
+
+html.dark {
+	color: #fff;
+	background: #000;
+	--credits: brightness(100);
+	--link: #55f;
+	--link-active: #f5a;
+	--link-visited: #5af;
+	--button-background: #2a2a2a;
+	--button-color: white;
+	--button-background-hover: #3f3f3f;
+	--input-background: black;
+	--input-color: #ffe;
+	--input-border: #fff;
+	--nav-color: #5f5;
+	--preview-color: white;
+	--code-background: #333;
+	--code-color: white;
+	--area-background: #eee;
+	--i-background: #fff;
+	--i-border: #000;
+	--toc-background: #fff1;
+	--toc-item: #f59;
+}
+
 :root {
 	--logos_size: 16px;
 	--logos_space: 16px;
 	--logos_options: left no-repeat;
+}
+
+:any-link {
+	color: var(--link);
+}
+
+:any-link:visited {
+	color: var(--link-visited);
+}
+
+:any-link:active {
+	color: var(--link-active);
 }
 
 body {
@@ -23,13 +83,13 @@ body {
 button,
 input[type="submit"],
 :any-link.button {
-	background: #ddd;
+	background: var(--button-background);
 	width: fit-content;
 	border: none;
 	font: inherit;
 	font-size: inherit;
 	text-decoration: none;
-	color: black;
+	color: var(--button-color);
 	padding: 0.25rem 0.5rem;
 	border-radius: 0.25rem;
 	cursor: pointer;
@@ -71,7 +131,7 @@ input[type="submit"],
 button:hover:not([disabled]),
 input[type="submit"]:hover:not([disabled]),
 :any-link.button:hover:not([disabled]) {
-	background: #ccc;
+	background: var(--button-background-hover);
 }
 
 [disabled] {
@@ -88,10 +148,10 @@ input:not([type="submit"]),
 select,
 textarea {
 	font: inherit;
-	background-color: white;
+	background-color: var(--input-background);
 	font-size: inherit;
-	color: #001;
-	border: #ccc solid 1px;
+	color: var(--input-color);
+	border: var(--input-border) solid 1px;
 	border-radius: 0.25rem;
 	padding: 0.25rem 0.5rem;
 }
@@ -105,7 +165,7 @@ form {
 }
 
 :any-link.nav {
-	color: purple;
+	color: var(--nav-color);
 	margin: 0 1rem;
 	text-decoration: none;
 }
@@ -135,7 +195,7 @@ dialog {
 
 #close_preview {
 	background: inherit;
-	color: black;
+	color: var(--preview-color);
 	display: inline-block;
 	font-size: 1rem;
 	position: absolute;
@@ -143,11 +203,11 @@ dialog {
 }
 
 code {
-	background-color: #eee;
+	background-color: var(--code-background);
 	font-family: monospace;
 	font-size: 1rem;
 	font-weight: bold;
-	color: black;
+	color: var(--code-color);
 }
 
 code.smaller {
@@ -166,7 +226,7 @@ code.snippet {
 	padding-left: var(--logos_space);
 	background: url("/icons/github.png") var(--logos_options);
 	background-size: var(--logos_size);
-	filter: brightness(0%);
+	filter: var(--credits);
 }
 
 :any-link.scratch::before {
@@ -174,7 +234,7 @@ code.snippet {
 	padding-left: var(--logos_space);
 	background: url("/icons/scratch.png") var(--logos_options);
 	background-size: var(--logos_size);
-	filter: brightness(0%);
+	filter: var(--credits);
 }
 
 :any-link.their_stickies::before {
@@ -182,20 +242,20 @@ code.snippet {
 	padding-left: var(--logos_space);
 	background: url("/favicon.ico") var(--logos_options);
 	background-size: var(--logos_size);
-	filter: brightness(0%);
+	filter: var(--credits);
 }
 
 .area {
 	padding: 15px;
-	background-color: #eee;
+	background-color: var(--area-background);
 	border-radius: 5px;
 	margin: 2px;
 }
 
 .input {
 	padding: 5px;
-	background-color: #fff;
-	border: #000 1px solid;
+	background-color: var(--i-background);
+	border: var(--i-border) 1px solid;
 	border-radius: 5px;
 	cursor: move;
 }
@@ -206,12 +266,12 @@ code.snippet {
 }
 
 .tableOfContents {
-	background-color: #0001;
+	background-color: var(--toc-background);
 	padding: 5px;
 }
 
 .tocItem {
 	text-decoration: none;
-	color: #900;
+	color: var(--toc-item) !important;
 	display: block;
 }
