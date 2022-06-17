@@ -15,13 +15,13 @@ const express = require('express'),
 			.replace(/x/g, () => Math.floor(Math.random() * 64).toString(36)),
 	clear = 86400000 * 7, /* 1 week(24 hours(24 * 60 * 60 * 1000) * 7) */
 	themes = [
-		"light",
-		"dark"
+		'light',
+		'dark'
 	],
 	prefers_scheme = require('@magica11y/prefers-color-scheme');
 require('ejs');
 
-var status = "";
+var status = '';
 
 app.use(cookie_parser());
 app.use(express.static('static'));
@@ -33,7 +33,7 @@ app.use(async (req, res, next) => {
 
 app.use(async (req, res, next) => {
 	if (!('theme' in req.cookies) || !themes.includes(req.cookies.theme))
-		res.cookie('theme', prefers_scheme.default() === prefers_scheme.colorSchemes.DARK ? "dark": 'light', { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
+		res.cookie('theme', prefers_scheme.default() === prefers_scheme.colorSchemes.DARK ? 'dark': 'light', { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
 	setTimeout(next, 150);
 }); 
 
@@ -42,11 +42,19 @@ function gobackhome(res, url = '/', time = 150) {
 }
 
 app.get('/theme_change', (req, res) => {
-	if (!('theme' in req.cookies) || !themes.includes(req.cookies.theme) || themes.indexOf(req.cookies.theme) + 1 >= themes.length) {
+	res.render('themes', {
+		themes: themes,
+		theme: req.cookies.theme || themes[0],
+		selected: themes.indexOf(req.cookies.theme) + 1 > themes.length ? 0 : themes.indexOf(req.cookies.theme) + 1
+	});
+})
+
+app.get('/api/theme', (req, res) => {
+	if (!('theme' in req.query) || themes.length - 1 < parseInt(req.query.theme)) {
 		res.cookie('theme', themes[0], { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
 		return gobackhome(res);
 	}
-	res.cookie('theme', themes[themes.indexOf(req.cookies.theme) + 1], { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
+	res.cookie('theme', themes[parseInt(req.query.theme)], { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
 	gobackhome(res);
 })
 
@@ -181,7 +189,27 @@ app.get('/add', (req, res) => {
 		gobackhome(res);
 		return;
 	}
-	setTimeout(() => res.render('preview', { theme: req.cookies.theme || themes[0] }), 1000);
+	let info = { id: null, user: null, name: null };
+	if ('url' in req.query || 'topicId' in req.query) {
+		let id = (req.query.topicId || req.query.url.split('/')[5]).toString();
+		fetch(`https://scratchdb.lefty.one/v3/forum/topic/posts/${id}/0?o=oldest`)
+			.then(e => e.json())
+			.then(e => {
+				let topic = e[0];
+				info = {
+					id: id,
+					user: topic.username,
+					name: topic.topic.title
+				};
+			})
+	}
+	setTimeout(() => res.render('preview', {
+		theme: req.cookies.theme || themes[0],
+		preview: {
+			open: 'url' in req.query || 'topicId' in req.query,
+			...info
+		}
+	}), 1000);
 });
 
 app.get('/remove', (req, res) => {
@@ -474,12 +502,33 @@ app.get('/dashboard', (req, res) => {
 		gobackhome(res);
 		return;
 	}
+	let info = { id: null, user: null, name: null };
+	if ('url' in req.query || 'topicId' in req.query) {
+		let id = (req.query.topicId || req.query.url.split('/')[5]).toString();
+		fetch(`https://scratchdb.lefty.one/v3/forum/topic/posts/${id}/0?o=oldest`)
+			.then(e => e.json())
+			.then(e => {
+				let topic = e[0];
+				info = {
+					id: id,
+					user: topic.username,
+					name: topic.topic.title
+				};
+			})
+	}
 	fs.readFile(__dirname + '/users_data.json', (err, data) => {
 		if (err) throw err;
 		let body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
 		stickies = (body[user.toLowerCase()] || { stickies: [] }).stickies;
-		setTimeout(() => res.render('dashboard', { stickies: stickies, theme: req.cookies.theme || themes[0] }), 1000);
+		setTimeout(() => res.render('dashboard', {
+			stickies: stickies,
+			theme: req.cookies.theme || themes[0],
+			preview: {
+				open: 'url' in req.query || 'topicId' in req.query,
+				...info
+			}
+		}), 1000);
 	});
 })
 

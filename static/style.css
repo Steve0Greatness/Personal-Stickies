@@ -22,6 +22,9 @@ html.light {
 	--i-border: #000;
 	--toc-background: #0001;
 	--toc-item: #900;
+	--dialog-color: black;
+	--dialog-background: white;
+	--dialog-border: #000;
 }
 
 html.dark {
@@ -41,11 +44,14 @@ html.dark {
 	--preview-color: white;
 	--code-background: #333;
 	--code-color: white;
-	--area-background: #eee;
-	--i-background: #fff;
-	--i-border: #000;
-	--toc-background: #fff1;
+	--area-background: #252525;
+	--i-background: #000;
+	--i-border: #fff;
+	--toc-background: #fff2;
 	--toc-item: #f59;
+	--dialog-color: white;
+	--dialog-background: #232323;
+	--dialog-border: #ccc;
 }
 
 :root {
@@ -181,6 +187,9 @@ nav {
 dialog {
 	padding: 1em;
 	padding-top: 0;
+	background-color: var(--dialog-background);
+	color: var(--dialog-color);
+	border-color: var(--dialog-border);
 }
 
 .preview {
@@ -197,9 +206,11 @@ dialog {
 	background: inherit;
 	color: var(--preview-color);
 	display: inline-block;
+	font-weight: 900;
 	font-size: 1rem;
 	position: absolute;
 	right: 5%;
+	top: 5px;
 }
 
 code {

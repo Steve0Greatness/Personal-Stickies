@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" class="<%- theme -%>">
+	
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Theme Selector</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+	
+<body>
+	<h1>Theme Selector</h1>
+	<form action="/api/theme">
+		<select required name="theme" id="theme">
+			<% for (let i = 0; i < themes.length; i++) { %>
+			<option value="<%- i -%>" <%- i === selected ? 'selected' : '' -%>><%- themes[i] -%></option>
+			<% } %>
+		</select>
+		<label for="theme">Theme</label>
+		<p><input type="submit" value="Change to Theme"></p>
+	</form>
+</body>
+	
+</html>

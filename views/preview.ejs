@@ -22,7 +22,8 @@
 			<legend>From URL</legend>
 			<input type="url" required name="url" placeholder="https://scratch.mit.edu/discuss/topic/..." pattern="https?://scratch\.mit\.edu\/discuss\/topic\/.+">
 			<input type="submit" value="Add From URL">
-			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[5])">Preview</button>
+			<button class="preview" type="submit" formaction="#preview" formmethod="get">Preview</button>
+<!-- 			 onclick="preview(this.parentElement.querySelector('input').value.split('/')[5])"  -->
 		</fieldset>
 	</form>
 	<form action="/api/add" method="get">
@@ -30,16 +31,22 @@
 			<legend>From Id</legend>
 			<input type="number" placeholder="..." required name="topicId">
 			<input type="submit" value="Add From Id">
-			<button class="preview" type="button" onclick="preview(this.parentElement.querySelector('input').value.toString())">Preview</button>
+			<button class="preview" type="submit" formaction="/add#preview" formmethod="get">Preview</button>
+<!-- 			onclick="preview(this.parentElement.querySelector('input').value.toString())"  -->
 		</fieldset>
 	</form>
-	<dialog>
-		<button id="close_preview">X</button>
+	<dialog <%- preview.open ? 'open' : '' -%>>
+<!-- 		<button id="close_preview">X</button> -->
+		<a href="?" class="button" id="close_preview">X</a>
 		<h2>Previewing</h2>
-		<div id="preview"></div>
+		<div id="preview">
+			<% if (preview.open) { %>
+			<img src="/sticky.png"> Sticky: <a href="https://scratch.mit.edu/discuss/topic/<% preview.id %>"><%- preview.name -%></a> by <%- preview.user -%>
+			<% } %>
+		</div>
 	</dialog>
 	<iframe class="me" src="/me_embed"></iframe>
-	<script src="/preview.js"></script>
+<!-- 	<script src="/preview.js"></script> -->
 </body>
 	
 </html>

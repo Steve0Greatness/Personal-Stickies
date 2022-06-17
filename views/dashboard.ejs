@@ -29,7 +29,7 @@
 			<legend>From URL</legend>
 			<input type="url" required name="url" pattern="https?://scratch\.mit\.edu\/discuss\/topic\/.+">
 			<input type="submit" value="Add From URL">
-			<button class="preview" id="fromUrlPre" type="button" onclick="preview(this.parentElement.querySelector('input').value.split('/')[5])">Preview</button>
+			<button class="preview" type="submit" formaction="#add" formmethod="get">Preview</button>
 		</fieldset>
 	</form>
 	<form action="/api/add" method="get">
@@ -37,16 +37,18 @@
 			<legend>From Id</legend>
 			<input type="number" required name="topicId">
 			<input type="submit" value="Add From Id">
-			<button class="preview" id="fromIdPre" type="button" onclick="preview(this.parentElement.querySelector('input').value.toString())">Preview</button>
+			<button class="preview" type="submit" formaction="#add" formmethod="get">Preview</button>
 		</fieldset>
 	</form>
-	<dialog>
-		<button id="close_preview">X</button>
+	<dialog <%- preview.open ? 'open' : '' -%>>
+		<a href="?#add" class="button" id="close_preview">X</a>
 		<h2>Previewing</h2>
-		<div id="preview"></div>
+		<div id="preview">
+			<% if (preview.open) { %>
+			<img src="/sticky.png"> Sticky: <a href="https://scratch.mit.edu/discuss/topic/<% preview.id %>"><%- preview.name -%></a> by <%- preview.user -%>
+			<% } %>
+		</div>
 	</dialog>
-	<script src="/preview.js"></script>
-	<noscript>Unforchunatly, with JavaScript turned off for this website, you are unable to use the preview feature.</noscript>
 	<h2 id="remove">Remove a Sticky</h2>
 	<form action="/api/remove" method="get">
 		<fieldset>
