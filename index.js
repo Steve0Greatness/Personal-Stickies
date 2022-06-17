@@ -35,7 +35,7 @@ app.use(async (req, res, next) => {
 	if (!('theme' in req.cookies) || !themes.includes(req.cookies.theme))
 		res.cookie('theme', prefers_scheme.default() === prefers_scheme.colorSchemes.DARK ? "dark": 'light', { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
 	setTimeout(next, 150);
-});
+}); 
 
 function gobackhome(res, url = '/', time = 150) {
 	setTimeout(() => res.redirect(url), time);
@@ -181,7 +181,7 @@ app.get('/add', (req, res) => {
 		gobackhome(res);
 		return;
 	}
-	setTimeout(() => res.render('preview', { theme: req.cookies.theme || 'changeMe' }), 1000);
+	setTimeout(() => res.render('preview', { theme: req.cookies.theme || themes[0] }), 1000);
 });
 
 app.get('/remove', (req, res) => {
@@ -194,12 +194,12 @@ app.get('/remove', (req, res) => {
 		let body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
 		stickies = body[user.toLowerCase()].stickies;
-		setTimeout(() => res.render('remove', { stickies: stickies, theme: req.cookies.theme || 'changeMe' }), 1000);
+		setTimeout(() => res.render('remove', { stickies: stickies, theme: req.cookies.theme || themes[0] }), 1000);
 	});
 });
 
 app.get('/', (req, res) => {
-	setTimeout(() => res.render(`index`, { bool: 'uuid' in req.cookies, del: 'delete_comment' in req.query, theme: req.cookies.theme || 'changeMe' }), 1000);
+	setTimeout(() => res.render(`index`, { bool: 'uuid' in req.cookies, del: 'delete_comment' in req.query, theme: req.cookies.theme || themes[0] }), 1000);
 });
 
 app.get('/users/:user', (req, res) => {
@@ -217,7 +217,7 @@ app.get('/users/:user', (req, res) => {
 						user: { user: { id: e.id }, stickies: [] },
 						name: e.username,
 						size: 16,
-						theme: req.cookies.theme || 'changeMe'
+						theme: req.cookies.theme || themes[0]
 					});
 				})
 				.catch(_ => {
@@ -225,7 +225,7 @@ app.get('/users/:user', (req, res) => {
 						code: 404,
 						msg: 'User Not Found',
 						desc: 'The requested user could not be found by the server.',
-						theme: req.cookies.theme || 'changeMe'
+						theme: req.cookies.theme || themes[0]
 					});
 				})
 			return;
@@ -233,7 +233,7 @@ app.get('/users/:user', (req, res) => {
 		user = body[user.toLowerCase()];
 		let name = user.user.name,
 			size = '16';
-		res.render('user', { name: name, user: user, size: size, theme: req.cookies.theme || 'changeMe' });
+		res.render('user', { name: name, user: user, size: size, theme: req.cookies.theme || themes[0] });
 	});
 });
 
@@ -250,14 +250,14 @@ app.get('/users/:user/bbcode', (req, res) => {
 						user: { user: { id: e.id }, stickies: [] },
 						name: e.username,
 						size: 16,
-						theme: req.cookies.theme || 'changeMe'
+						theme: req.cookies.theme || themes[0]
 					});				})
 				.catch(_ => {
 					res.render('error', {
 						code: 404,
 						msg: 'User Not Found',
 						desc: 'The requested user could not be found by the server.',
-						theme: req.cookies.theme || 'changeMe'
+						theme: req.cookies.theme || themes[0]
 					});
 				})
 			return;
@@ -265,7 +265,7 @@ app.get('/users/:user/bbcode', (req, res) => {
 		user = body[user.toLowerCase()];
 		let name = user.user.name,
 			size = '16';
-		res.render('bbcode', { name: name, user: user, size: size,theme: req.cookies.theme || 'changeMe' });
+		res.render('bbcode', { name: name, user: user, size: size,theme: req.cookies.theme || themes[0] });
 	});
 });
 
@@ -276,7 +276,7 @@ app.get('/all_users', (req, res) => {
 		}
 		let body = JSON.parse(data);
 		setTimeout(() => {
-			res.render('all_users', { body: body, theme: req.cookies.theme || 'changeMe' });
+			res.render('all_users', { body: body, theme: req.cookies.theme || themes[0] });
 		}, 100);
 	});
 });
@@ -296,7 +296,7 @@ app.get('/api/users/:user', cors(), (req, res) => {
 				error: 404,
 				message: 'User Not Found',
 				description: 'The requested user could not be found by the server.',
-				theme: req.cookies.theme || 'changeMe'
+				theme: req.cookies.theme || themes[0]
 			});
 			return;
 		}
@@ -308,7 +308,7 @@ app.get('/api/users/:user', cors(), (req, res) => {
 app.get('/credits', (req, res) => {
 	fs.readFile(__dirname + '/static/contributers.json', (err, data) => {
 		if (err) throw err;
-		res.render('credits', { body: JSON.parse(data), theme: req.cookies.theme || 'changeMe' });
+		res.render('credits', { body: JSON.parse(data), theme: req.cookies.theme || themes[0] });
 	});
 });
 
@@ -334,13 +334,13 @@ app.get('/me_embed', (req, res) => {
 		}
 		res.render('me', {
 			stickies: body[uuids.get(req.cookies.uuid).toLowerCase()].stickies,
-			theme: req.cookies.theme || 'changeMe'
+			theme: req.cookies.theme || themes[0]
 		});
 	});
 });
 
 app.get('/api', (req, res) => {
-	res.render('docs', { theme: req.cookies.theme || 'changeMe' });
+	res.render('docs', { theme: req.cookies.theme || themes[0] });
 });
 
 app.get('/rearrange', (req, res) => {
@@ -354,7 +354,7 @@ app.get('/rearrange', (req, res) => {
 			body = JSON.parse(data);
 		user = body[user.toLowerCase()];
 		let stickies = user.stickies;
-		res.render('rearrange', { stickies: stickies, theme: req.cookies.theme || 'changeMe' });
+		res.render('rearrange', { stickies: stickies, theme: req.cookies.theme || themes[0] });
 	});
 });
 
@@ -390,7 +390,7 @@ app.get('/stats', (_, res) => {
 })
 
 app.get('/auth/', (req, res) => {
-	res.render('auth_home', { saved: 'saved' in req.cookies, theme: req.cookies.theme || 'changeMe' })
+	res.render('auth_home', { saved: 'saved' in req.cookies, theme: req.cookies.theme || themes[0] })
 })
 
 app.get('/auth/login', (req, res) => {
@@ -407,7 +407,7 @@ app.get('/auth/login', (req, res) => {
 				isuser: 'username' in e,
 				private: e.privateCode,
 				fullscreen: method === 0,
-				theme: req.cookies.theme || 'changeMe'
+				theme: req.cookies.theme || themes[0]
 			})
 		})
 })
@@ -443,9 +443,9 @@ app.get('/auth/oneclick/', (req, res) => {
 			code: 400,
 			msg: "Nothing Saved",
 			desc: 'You may need to log in the old fashioned way',
-			theme: req.cookies.theme || 'changeMe'
+			theme: req.cookies.theme || themes[0]
 		})
-	res.render('oneclick', { tokens: req.cookies.saved, theme: req.cookies.theme || 'changeMe' })
+	res.render('oneclick', { tokens: req.cookies.saved, theme: req.cookies.theme || themes[0] })
 })
 
 app.get('/auth/oneclick/finally', (req, res) => {
@@ -484,7 +484,7 @@ app.get('/dashboard', (req, res) => {
 })
 
 app.get('/auth/profile', (req, res) => {
-	res.render('profile_auth', { theme: req.cookies.theme || 'changeMe' })
+	res.render('profile_auth', { theme: req.cookies.theme || themes[0] })
 })
 
 app.listen(3000, () => {
