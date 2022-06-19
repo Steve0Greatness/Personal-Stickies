@@ -4,9 +4,8 @@ html.light {
 	color: #000;
 	background: #fff;
 	--credits: brightness(0);
-	--link: #1f1ffa;
-	--link-active: #ef5a5a;
-	--link-visited: #de12ef;
+	--pin-filter: rotate-hue(0deg);
+	--link: #1aa0d8;
 	--button-background: #ddd;
 	--button-color: black;
 	--button-background-hover: #ccc;
@@ -31,9 +30,8 @@ html.dark {
 	color: #fff;
 	background: #000;
 	--credits: brightness(100);
-	--link: #55f;
-	--link-active: #f5a;
-	--link-visited: #5af;
+	--pin-filter: rotate-hue(0deg);
+	--link: #45cbff;
 	--button-background: #2a2a2a;
 	--button-color: white;
 	--button-background-hover: #3f3f3f;
@@ -62,14 +60,6 @@ html.dark {
 
 :any-link {
 	color: var(--link);
-}
-
-:any-link:visited {
-	color: var(--link-visited);
-}
-
-:any-link:active {
-	color: var(--link-active);
 }
 
 body {
@@ -285,4 +275,8 @@ code.snippet {
 	text-decoration: none;
 	color: var(--toc-item) !important;
 	display: block;
+}
+
+sticky_icon {
+	filter: var(--pin-filter);
 }

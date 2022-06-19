@@ -11,6 +11,9 @@
 	
 <body>
 	<h1>Theme Selector</h1>
+	<nav>
+		<a href="/" class="nav">Back Home</a>
+	</nav>
 	<form action="/api/theme">
 		<select required name="theme" id="theme">
 			<% for (let i = 0; i < themes.length; i++) { %>

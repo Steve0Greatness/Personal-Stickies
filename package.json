@@ -1,14 +1,14 @@
 {
-  "name": "spotlesspessimisticprinters",
+  "name": "Personal-Stickies",
   "version": "1.0.0",
-  "description": "",
+  "description": "A way to have personalized stickies",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Steve0Greatness",
+  "license": "MIT",
   "dependencies": {
     "@magica11y/prefers-color-scheme": "^2.0.3",
     "cookie-parser": "^1.4.6",
