@@ -4,7 +4,7 @@
   "description": "A way to have personalized stickies",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run dev"
   },
   "keywords": [],
   "author": "Steve0Greatness",
