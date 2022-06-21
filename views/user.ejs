@@ -13,8 +13,11 @@
 	<h1>User's Stickies</h1>
 	<nav>
 		<a href="/" class="nav">Back Home</a>
+		<a href="/all_users" class="nav">All Users</a>
 	</nav>
-	<p id="actions"><a class="button" href="/users/<%- name -%>/bbcode">Show BBCode</a></p>
+	<p id="actions">
+		<a class="button" href="/users/<%- name -%>/bbcode">Show BBCode</a>
+	</p>
 	<div id="user_info"><a href="//scratch.mit.edu/users/<%- name -%>"><img width="16" height="16" src="//cdn2.scratch.mit.edu/get_image/user/<%- user.user.id -%>_<%- size -%>x<%- size -%>.png"><%- name -%></a></div><div id="user_pins">
 	<main>
 	<% for (let s of user.stickies) { %>

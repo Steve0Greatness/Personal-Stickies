@@ -14,7 +14,7 @@
 	<form action="/auth/oneclick/finally">
 		<select name="index" id="index" required>
 			<% for (let i = 0; i < tokens.length; i++) { %>
-				<option value="<%- i -%>"><%- tokens[i].user -%></option>
+			<option value="<%- i -%>"><%- tokens[i].user -%></option>
 			<% } %>
 		</select>
 		<label for="index">User</label><br>

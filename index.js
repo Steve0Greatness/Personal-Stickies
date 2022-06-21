@@ -35,7 +35,7 @@ app.use(async (req, res, next) => {
 	if (!('theme' in req.cookies) || !themes.includes(req.cookies.theme))
 		res.cookie('theme', prefers_scheme.default() === prefers_scheme.colorSchemes.DARK ? 'dark': 'light', { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
 	setTimeout(next, 150);
-}); 
+});
 
 function gobackhome(res, url = '/', time = 150) {
 	setTimeout(() => res.redirect(url), time);
@@ -473,7 +473,20 @@ app.get('/auth/oneclick/', (req, res) => {
 			desc: 'You may need to log in the old fashioned way',
 			theme: req.cookies.theme || themes[0]
 		})
-	res.render('oneclick', { tokens: req.cookies.saved, theme: req.cookies.theme || themes[0] })
+	for (let i = 0; i < req.cookies.saved.length; i++) {
+		let { token } = req.cookies.saved[i];
+		fetch(`https://auth-api.itinerary.eu.org/auth/oneClickSignIn`, {
+			headers: {
+				Authorization: token
+			}
+		})
+			.then(e => e.json())
+			.then(e => {
+				if (e.length <= 0)
+					return res.cookie('saved', req.cookies.saved.filter(d => d.token !== token));
+			})
+	}
+	setTimeout(() => res.render('oneclick', { tokens: req.cookies.saved, theme: req.cookies.theme || themes[0] }), 1000)
 })
 
 app.get('/auth/oneclick/finally', (req, res) => {
@@ -490,6 +503,8 @@ app.get('/auth/oneclick/finally', (req, res) => {
 	})
 		.then(e => e.json())
 		.then(e => {
+			if (e.length <= 0)
+				return gobackhome(res);
 			let uuid = uuid_gen();
 			uuids.set(uuid, e[0].username);
 			res.cookie('uuid', uuid, { maxAge: clear, httpOnly: true });
