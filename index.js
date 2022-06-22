@@ -562,24 +562,6 @@ app.use((req, res, _) => {
 })
 
 app.listen(3000, () => {
-	let preform_checks = () => {
-		console.log('Rechecking Names Of The Topics')
-		fs.readFile(__dirname + '/users_data.json', (err, data) => {
-			if (err) throw err;
-			let body = JSON.parse(data);
-			for (let user in body) {
-				for (let i = 0; i < body[user].stickies.length; i++) {
-					fetch(`https://scratchdb.lefty.one/v3/forum/topic/posts/${body[user].stickies[i].topic_ID}/0?o=oldest`)
-						.then(e => e.json())
-						.then(e => e[0])
-						.then(e => {
-							body[user].stickies[i].topic_NAME = e.topic.title;
-							fs.writeFile(__dirname + '/users_data.json', JSON.stringify(body);
-						})
-				}
-			}
-		})
-	}
 	console.log('-- Server Stats --');
 	const current_time = new Date(),
 		parsed_time = `${
@@ -596,7 +578,6 @@ app.listen(3000, () => {
 		console.log(`There are ${users.length} user(s) in the DataBase`);
 		status += `<div class="on_start"><span id="user_ammount">${users.length}</span> user(s)</div>`;
 	});
-	preform_checks()
 	setInterval(() => {
 		let new_time = new Date(),
 			parsed_new = `${
@@ -606,5 +587,4 @@ app.listen(3000, () => {
 		console.log(`=> Clearing UUIDs from the DataBase at ${parsed_new}`)
 		status += `<div class="uuid_clear">UUIDs cleared at <time>${parsed_new}</time></div>`;
 	}, clear);
-	setInterval(preform_checks, 60000)
 });
