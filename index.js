@@ -4,7 +4,8 @@ const express = require('express'),
 	uuids = require('store'),
 	fetch = (...args) =>
 		import('node-fetch').then(({ default: fetch }) => fetch(...args)),
-	fs = require('fs'),
+	filehandle = require('fs').promises,
+	path = require('path'),
 	cors = require('cors'),
 	uuid_gen = (sections = 5, chars_per_sec = 4, init_end = 6) =>
 		`${new Array(init_end).fill("x").join("")}-${
@@ -36,6 +37,25 @@ app.use(async (req, res, next) => {
 		res.cookie('theme', prefers_scheme.default() === prefers_scheme.colorSchemes.DARK ? 'dark': 'light', { maxAge: 5 * 31 * 24 * 60 * 60 * 1000 * 2 });
 	setTimeout(next, 150);
 });
+
+async function recheck_topic_names() {
+	try {
+		data = Buffer.from(await filehandle.readFile(path.join(__dirname, 'users_data.json')), 'buffer').toString('utf-8')
+		let body = JSON.parse(data);
+		for (let id in body) {
+			for (let i = 0; i < body[id].stickies.length; i++) {
+				fetch(`https://scratchdb.lefty.one/v3/forum/topic/info/${body[id].stickies[i].topic_ID}`)
+					.then(e => e.json())
+					.then(async e => {
+						body[id].stickies[i].topic_NAME = e.title;
+						await filehandle.writeFile(path.join(__dirname, 'users_data.json'), JSON.stringify(body))
+					})
+			}
+		}
+	} catch (er) {
+		console.log(er);
+	}
+}
 
 function gobackhome(res, url = '/', time = 150) {
 	setTimeout(() => res.redirect(url), time);
@@ -89,9 +109,9 @@ app.get('/api/parseURL', (req, res) => {
 	res.redirect(`/api/add?topicId=${url[3]}`);
 });
 
-app.get('/api/add', (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
+app.get('/api/add', async (req, res) => {
+	try {
+		let data = Buffer.from(await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8');
 		if (
 			uuids.get(req.cookies.uuid) === undefined ||
 			!('uuid' in req.cookies) ||
@@ -128,7 +148,7 @@ app.get('/api/add', (req, res) => {
 				`https://scratchdb.lefty.one/v3/forum/topic/posts/${req.query.topicId}/0?o=oldest`
 			)
 				.then(s => s.json())
-				.then(b => {
+				.then(async b => {
 					body[user.toLowerCase()].stickies = body[
 						user.toLowerCase()
 					].stickies.filter((s) => s.topic_ID !== b[0].topic.id);
@@ -138,18 +158,18 @@ app.get('/api/add', (req, res) => {
 						topic_OWNER: b[0].username,
 					});
 					let write = new Uint8Array(Buffer.from(JSON.stringify(body)));
-					fs.writeFile(__dirname + '/users_data.json', write, (e) => {
-						if (e) throw e;
-					});
+					await filehandle.writeFile(__dirname + '/users_data.json', write);
 					gobackhome(res, '/dashboard');
 				})
 		}, timeout)
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
-app.get('/api/remove', (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
+app.get('/api/remove', async (req, res) => {
+	try {
+		let data = (await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8')
 		if (
 			uuids.get(req.cookies.uuid) === undefined || !('uuid' in req.cookies)
 		) {
@@ -167,11 +187,12 @@ app.get('/api/remove', (req, res) => {
 		body[user.toLowerCase()].stickies = body[
 			user.toLowerCase()
 		].stickies.filter((e) => e.topic_ID !== parseInt(req.query.topicId));
-		fs.writeFile(__dirname + '/users_data.json', JSON.stringify(body), (err) => {
-			if (err) throw err;
-		});
+		await filehandle.writeFile(__dirname + '/users_data.json', JSON.stringify(body));
 		gobackhome(res, '/dashboard');
-	});
+	// });
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 app.get('/signin', (_, res) => {
@@ -212,30 +233,30 @@ app.get('/add', (req, res) => {
 	}), 1000);
 });
 
-app.get('/remove', (req, res) => {
+app.get('/remove', async (req, res) => {
 	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
 		res.clearCookie('uuid');
 		gobackhome(res);
 	}
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
-		let body = JSON.parse(data),
+	try {
+		let data = (await filehandler.readFile(path.join(__dirname, '/users_data.json'))).toString('utf-8'),
+			body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
 		stickies = body[user.toLowerCase()].stickies;
 		setTimeout(() => res.render('remove', { stickies: stickies, theme: req.cookies.theme || themes[0] }), 1000);
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 app.get('/', (req, res) => {
 	setTimeout(() => res.render(`index`, { bool: 'uuid' in req.cookies, del: 'delete_comment' in req.query, theme: req.cookies.theme || themes[0] }), 1000);
 });
 
-app.get('/users/:user', (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) {
-			throw err;
-		}
-		let body = JSON.parse(data),
+app.get('/users/:user', async (req, res) => {
+	try {
+		let data = (await filehandler.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
+			body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
 			fetch(`https://api.scratch.mit.edu/users/${user}`)
@@ -262,13 +283,15 @@ app.get('/users/:user', (req, res) => {
 		let name = user.user.name,
 			size = '16';
 		res.render('user', { name: name, user: user, size: size, theme: req.cookies.theme || themes[0] });
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 app.get('/users/:user/bbcode', (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
-		let body = JSON.parse(data),
+	try {
+		let data = filehandler.readFile(path.join(__dirname + '/users_data.json')),
+			body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
 			fetch(`https://api.scratch.mit.edu/users/${user}`)
@@ -295,29 +318,31 @@ app.get('/users/:user/bbcode', (req, res) => {
 		let name = user.user.name,
 			size = '16';
 		res.render('bbcode', { name: name, user: user, size: size,theme: req.cookies.theme || themes[0] });
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
-app.get('/all_users', (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) {
-			throw err;
-		}
-		let body = JSON.parse(data);
+app.get('/all_users', async (req, res) => {
+	try {
+		let data = (await filehandle.readFile(__dirname + '/users_data.json')).toString('utf-8'),
+			body = JSON.parse(data);
 		setTimeout(() => {
 			res.render('all_users', { body: body, theme: req.cookies.theme || themes[0] });
 		}, 100);
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 app.get('/api/user_redirect', (req, res) => {
 	res.redirect(`/users/${req.query.user}`);
 });
 
-app.get('/api/users/:user', cors(), (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
-		let body = JSON.parse(data),
+app.get('/api/users/:user', cors(), async (req, res) => {
+	try {
+		let data = (await filehandler.readFile(__dirname + '/users_data.json')).toString('utf-8'),
+			body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
 			res.status(404);
@@ -331,14 +356,18 @@ app.get('/api/users/:user', cors(), (req, res) => {
 		}
 		let user_data = body[user.toLowerCase()];
 		res.send(user_data);
-	});
+	} catch (err) {
+		console.log(err)
+	}
 });
 
-app.get('/credits', (req, res) => {
-	fs.readFile(__dirname + '/static/contributers.json', (err, data) => {
-		if (err) throw err;
+app.get('/credits', async (req, res) => {
+	try {
+		let data = (await filehandle.readFile(path.join(__dirname, 'static', 'contributers.json'))).toString('utf-8')
 		res.render('credits', { body: JSON.parse(data), theme: req.cookies.theme || themes[0] });
-	});
+	} catch (err) {
+		console.log(err)
+	}
 });
 
 app.get('/me', (req, res) => {
@@ -349,10 +378,10 @@ app.get('/me', (req, res) => {
 	res.redirect(`/users/${uuids.get(req.cookies.uuid)}`);
 });
 
-app.get('/me_embed', (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
-		let body = JSON.parse(data);
+app.get('/me_embed', async (req, res) => {
+	try {
+		let data = (await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
+			body = JSON.parse(data);
 		if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
 			res.redirect('/');
 			return;
@@ -365,7 +394,9 @@ app.get('/me_embed', (req, res) => {
 			stickies: body[uuids.get(req.cookies.uuid).toLowerCase()].stickies,
 			theme: req.cookies.theme || themes[0]
 		});
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 app.get('/api', (req, res) => {
@@ -373,8 +404,8 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/rearrange', (req, res) => {
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
+	try {
+		let data = filehandle.readFile(path.join(__dirname, 'users_data.json'));
 		if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
 			gobackhome(res);
 			return;
@@ -384,17 +415,19 @@ app.get('/rearrange', (req, res) => {
 		user = body[user.toLowerCase()];
 		let stickies = user.stickies;
 		res.render('rearrange', { stickies: stickies, theme: req.cookies.theme || themes[0] });
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
-app.get('/api/rearrange', (req, res) => {
+app.get('/api/rearrange', async (req, res) => {
 	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined || !('indexes' in req.query)) {
 		gobackhome(res);
 		return;
 	}
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
-		let user = uuids.get(req.cookies.uuid),
+	try {
+		let data = (await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
+			user = uuids.get(req.cookies.uuid),
 			body = JSON.parse(data),
 			indexes = req.query.indexes.split(',');
 		user = body[user.toLowerCase()];
@@ -406,12 +439,12 @@ app.get('/api/rearrange', (req, res) => {
 		}
 		setTimeout(() => {
 			body[user.user.name.toLowerCase()].stickies = final;
-			fs.writeFile(__dirname + '/users_data.json', JSON.stringify(body), (e) => {
-				if (e) throw e;
-			});
+			filehandle.writeFile(path.join(__dirname, '/users_data.json'), JSON.stringify(body));
 			gobackhome(res, '/dashboard');
 		}, 1000)
-	});
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 app.get('/stats', (_, res) => {
@@ -513,7 +546,7 @@ app.get('/auth/oneclick/finally', (req, res) => {
 		})
 })
 
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', async (req, res) => {
 	if (!('uuid' in req.cookies) || uuids.get(req.cookies.uuid) === undefined) {
 		gobackhome(res);
 		return;
@@ -532,20 +565,22 @@ app.get('/dashboard', (req, res) => {
 				};
 			})
 	}
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
-		let body = JSON.parse(data),
-			user = uuids.get(req.cookies.uuid);
-		stickies = (body[user.toLowerCase()] || { stickies: [] }).stickies;
-		setTimeout(() => res.render('dashboard', {
-			stickies: stickies,
-			theme: req.cookies.theme || themes[0],
-			preview: {
-				open: 'url' in req.query || 'topicId' in req.query,
-				...info
-			}
-		}), 1000);
-	});
+	try {
+		let data = (await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
+			body = JSON.parse(data),
+			user = uuids.get(req.cookies.uuid),
+			stickies = (body[user.toLowerCase()] || { stickies: [] }).stickies;
+			setTimeout(() => res.render('dashboard', {
+				stickies: stickies,
+				theme: req.cookies.theme || themes[0],
+				preview: {
+					open: 'url' in req.query || 'topicId' in req.query,
+					...info
+				}
+			}), 1000);
+	} catch (err) {
+		console.log(err);
+	}
 })
 
 app.get('/auth/profile', (req, res) => {
@@ -561,7 +596,7 @@ app.use((req, res, _) => {
 	})
 })
 
-app.listen(3000, () => {
+app.listen(3000, async () => {
 	console.log('-- Server Stats --');
 	const current_time = new Date(),
 		parsed_time = `${
@@ -571,13 +606,11 @@ app.listen(3000, () => {
 		`Server started: ${parsed_time}`
 	);
 	status += `<div class="on_start">Server started: <time>${parsed_time}</time></div>`;
-	fs.readFile(__dirname + '/users_data.json', (err, data) => {
-		if (err) throw err;
-		let body = JSON.parse(data),
-			users = Object.keys(body);
-		console.log(`There are ${users.length} user(s) in the DataBase`);
-		status += `<div class="on_start"><span id="user_ammount">${users.length}</span> user(s)</div>`;
-	});
+	let data = (await filehandle.readFile(path.join(__dirname, '/users_data.json'))).toString('utf-8'),
+		body = JSON.parse(data),
+		users = Object.keys(body);
+	console.log(`There are ${users.length} user(s) in the DataBase`);
+	status += `<div class="on_start"><span id="user_ammount">${users.length}</span> user(s)</div>`;
 	setInterval(() => {
 		let new_time = new Date(),
 			parsed_new = `${
@@ -587,4 +620,6 @@ app.listen(3000, () => {
 		console.log(`=> Clearing UUIDs from the DataBase at ${parsed_new}`)
 		status += `<div class="uuid_clear">UUIDs cleared at <time>${parsed_new}</time></div>`;
 	}, clear);
+	setInterval(recheck_topic_names, 60000 * 10)
+	recheck_topic_names()
 });
