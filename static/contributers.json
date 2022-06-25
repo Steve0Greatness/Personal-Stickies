@@ -1,48 +1,62 @@
 [
-	{
-		"names": {
-			"scratch": "steve0greatness",
-			"github": "steve0greatness",
-			"shown": "Steve0Greatness"
-		},
-		"inDB": true,
-		"roles": [
-			{
-				"name": "coding",
-				"emoji": "🖥"
-			},
-			{
-				"name": "ideas",
-				"emoji": "💡"
-			}
-		]
-	},
-	{
-		"names": {
-			"scratch": "NFlex23",
-			"github": "MystPi",
-			"shown": "NFlex23"
-		},
-		"inDB": true,
-		"roles": [
-			{
-				"name": "styling",
-				"emoji": "✨"
-			}
-		]
-	},
-	{
-		"names": {
-			"scratch": "MagicCrayon9342",
-			"github": "JaydenDev",
-			"shown": "MagicCrayon9342"
-		},
-		"inDB": true,
-		"roles": [
-			{
-				"name": "ideas",
-				"emoji": "💡"
-			}
-		]
-	}
+  {
+    "names": {
+      "scratch": "steve0greatness",
+      "github": "steve0greatness",
+      "shown": "Steve0Greatness"
+    },
+    "inDB": true,
+    "roles": [
+      {
+        "name": "coding",
+        "emoji": "🖥"
+      },
+      {
+        "name": "ideas",
+        "emoji": "💡"
+      }
+    ]
+  },
+  {
+    "names": {
+      "scratch": "NFlex23",
+      "github": "MystPi",
+      "shown": "NFlex23"
+    },
+    "inDB": true,
+    "roles": [
+      {
+        "name": "styling",
+        "emoji": "✨"
+      }
+    ]
+  },
+  {
+    "names": {
+      "scratch": "MagicCrayon9342",
+      "github": "JaydenDev",
+      "shown": "MagicCrayon9342"
+    },
+    "inDB": true,
+    "roles": [
+      {
+        "name": "ideas",
+        "emoji": "💡"
+      }
+    ]
+  },
+  {
+    "names": {
+      "scratch": "uwv",
+      "github": "zxnii",
+      "shown": "uwv"
+    },
+    "inDB": false,
+    "roles": [
+      {
+        "name": "improvements",
+        "emoji": "😎"
+      }
+    ]
+  }
 ]
