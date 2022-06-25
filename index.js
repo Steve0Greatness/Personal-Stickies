@@ -239,11 +239,7 @@ app.get('/remove', async (req, res) => {
 		gobackhome(res);
 	}
 	try {
-<<<<<<< HEAD
 		let data = (await filehandle.readFile(path.join(__dirname, '/users_data.json'))).toString('utf-8'),
-=======
-		let data = (await filehandler.readFile(path.join(__dirname, '/users_data.json'))).toString('utf-8'),
->>>>>>> origin/main
 			body = JSON.parse(data),
 			user = uuids.get(req.cookies.uuid);
 		stickies = body[user.toLowerCase()].stickies;
@@ -259,11 +255,7 @@ app.get('/', (req, res) => {
 
 app.get('/users/:user', async (req, res) => {
 	try {
-<<<<<<< HEAD
 		let data = (await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
-=======
-		let data = (await filehandler.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
->>>>>>> origin/main
 			body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
@@ -298,11 +290,7 @@ app.get('/users/:user', async (req, res) => {
 
 app.get('/users/:user/bbcode', (req, res) => {
 	try {
-<<<<<<< HEAD
 		let data = filehandle.readFile(path.join(__dirname + '/users_data.json')),
-=======
-		let data = filehandler.readFile(path.join(__dirname + '/users_data.json')),
->>>>>>> origin/main
 			body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
@@ -353,11 +341,7 @@ app.get('/api/user_redirect', (req, res) => {
 
 app.get('/api/users/:user', cors(), async (req, res) => {
 	try {
-<<<<<<< HEAD
 		let data = (await filehandle.readFile(__dirname + '/users_data.json')).toString('utf-8'),
-=======
-		let data = (await filehandler.readFile(__dirname + '/users_data.json')).toString('utf-8'),
->>>>>>> origin/main
 			body = JSON.parse(data),
 			user = req.params.user;
 		if (!(user.toLowerCase() in body)) {
@@ -622,7 +606,6 @@ app.listen(3000, async () => {
 		`Server started: ${parsed_time}`
 	);
 	status += `<div class="on_start">Server started: <time>${parsed_time}</time></div>`;
-<<<<<<< HEAD
 	let data = (await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
 		body = JSON.parse(data),
 		users = Object.keys(body),
@@ -638,11 +621,6 @@ app.listen(3000, async () => {
 			await filehandle.writeFile(contrib_path, JSON.stringify(contributers, null, 2));
 		}
 	}
-=======
-	let data = (await filehandle.readFile(path.join(__dirname, '/users_data.json'))).toString('utf-8'),
-		body = JSON.parse(data),
-		users = Object.keys(body);
->>>>>>> origin/main
 	console.log(`There are ${users.length} user(s) in the DataBase`);
 	status += `<div class="on_start"><span id="user_ammount">${users.length}</span> user(s)</div>`;
 	setInterval(() => {
