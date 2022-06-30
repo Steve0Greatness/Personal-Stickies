@@ -22,10 +22,10 @@
 	<main>
 	<% for (let s of user.stickies) { %>
 		<div class="sticky">
-    	<img src="/sticky.png"> Sticky:
-    	<a href="//scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>"><%- s.topic_NAME -%></a>
+    	<img src="/sticky.png" class="sticky_icon<%- s.topic_CLOSED ? " closed" : "" -%>"> Sticky:
+    	<a href="//scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>" <%- s.topic_CLOSED ? 'class="closed"' : "" -%>><%- s.topic_NAME -%></a>
     	by <%- s.topic_OWNER -%>
-    	<a href="//scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>/unread/">(New Posts)</a>
+    	<a href="//scratch.mit.edu/discuss/topic/<%- s.topic_ID -%>/unread/" <%- s.topic_CLOSED ? 'class="closed"' : "" -%>>(New Posts)</a>
 		</div>
 	<% } %>
 	<% if (user.stickies.length === 0) { %>

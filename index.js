@@ -22,8 +22,6 @@ const express = require('express'),
 	prefers_scheme = require('@magica11y/prefers-color-scheme');
 require('ejs');
 
-var status = '';
-
 app.use(cookie_parser());
 app.use(express.static('static'));
 app.set('view engine', 'ejs');
@@ -38,8 +36,10 @@ app.use(async (req, res, next) => {
 	setTimeout(next, 150);
 });
 
-async function recheck_topic_names() {
+async function recheck_topics() {
 	try {
+		let date = new Date();
+		console.log(`=> Updating all topics' information ; ${date.getMonth() + 1}(m) ${date.getDate()}, ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
 		data = Buffer.from(await filehandle.readFile(path.join(__dirname, 'users_data.json')), 'buffer').toString('utf-8')
 		let body = JSON.parse(data);
 		for (let id in body) {
@@ -48,6 +48,7 @@ async function recheck_topic_names() {
 					.then(e => e.json())
 					.then(async e => {
 						body[id].stickies[i].topic_NAME = e.title;
+						body[id].stickies[i].topic_CLOSED = Boolean(e.closed);
 						await filehandle.writeFile(path.join(__dirname, 'users_data.json'), JSON.stringify(body))
 					})
 			}
@@ -157,8 +158,7 @@ app.get('/api/add', async (req, res) => {
 						topic_NAME: b[0].topic.title,
 						topic_OWNER: b[0].username,
 					});
-					let write = new Uint8Array(Buffer.from(JSON.stringify(body)));
-					await filehandle.writeFile(__dirname + '/users_data.json', write);
+					await filehandle.writeFile(path.join(__dirname, '/users_data.json'), JSON.stringify(body));
 					gobackhome(res, '/dashboard');
 				})
 		}, timeout)
@@ -187,9 +187,8 @@ app.get('/api/remove', async (req, res) => {
 		body[user.toLowerCase()].stickies = body[
 			user.toLowerCase()
 		].stickies.filter((e) => e.topic_ID !== parseInt(req.query.topicId));
-		await filehandle.writeFile(__dirname + '/users_data.json', JSON.stringify(body));
+		await filehandle.writeFile(path.join(__dirname, '/users_data.json'), JSON.stringify(body));
 		gobackhome(res, '/dashboard');
-	// });
 	} catch (err) {
 		console.log(err);
 	}
@@ -447,10 +446,6 @@ app.get('/api/rearrange', async (req, res) => {
 	}
 });
 
-app.get('/stats', (_, res) => {
-	res.render('status', { status: status });
-})
-
 app.get('/auth/', (req, res) => {
 	res.render('auth_home', { saved: 'saved' in req.cookies, theme: req.cookies.theme || themes[0] })
 })
@@ -588,12 +583,13 @@ app.get('/auth/profile', (req, res) => {
 })
 
 app.use((req, res, _) => {
+	res.status(404);
 	res.render('error', {
 		theme: req.cookies.theme || themes[0],
 		code: 404,
 		msg: `Resource For ${req.pathname} Not Found`,
 		desc: 'The requested page was not found by the server'
-	})
+	});
 })
 
 app.listen(3000, async () => {
@@ -605,7 +601,6 @@ app.listen(3000, async () => {
 	console.log(
 		`Server started: ${parsed_time}`
 	);
-	status += `<div class="on_start">Server started: <time>${parsed_time}</time></div>`;
 	let data = (await filehandle.readFile(path.join(__dirname, 'users_data.json'))).toString('utf-8'),
 		body = JSON.parse(data),
 		users = Object.keys(body),
@@ -622,7 +617,6 @@ app.listen(3000, async () => {
 		}
 	}
 	console.log(`There are ${users.length} user(s) in the DataBase`);
-	status += `<div class="on_start"><span id="user_ammount">${users.length}</span> user(s)</div>`;
 	setInterval(() => {
 		let new_time = new Date(),
 			parsed_new = `${
@@ -630,8 +624,7 @@ app.listen(3000, async () => {
 		}(m) ${new_time.getDate()} ${new_time.getFullYear()} ${new_time.getHours()}:${new_time.getMinutes()}:${new_time.getSeconds()}`;
 		uuids.clearAll();
 		console.log(`=> Clearing UUIDs from the DataBase at ${parsed_new}`)
-		status += `<div class="uuid_clear">UUIDs cleared at <time>${parsed_new}</time></div>`;
 	}, clear);
-	setInterval(recheck_topic_names, 60000 * 10)
-	recheck_topic_names()
+	setInterval(recheck_topics, 60000 * 10)
+	recheck_topics()
 });

@@ -6,6 +6,8 @@ html.light {
 	--credits: brightness(0);
 	--pin-filter: rotate-hue(0deg);
 	--link: #1aa0d8;
+	--closed-pin-filter: grayscale() brightness(0.8);
+	--closed-link: #888;
 	--button-background: #ddd;
 	--button-color: black;
 	--button-background-hover: #ccc;
@@ -32,6 +34,8 @@ html.dark {
 	--credits: brightness(100);
 	--pin-filter: rotate-hue(0deg);
 	--link: #45cbff;
+	--closed-pin-filter: grayscale() brightness(3);
+	--closed-link: #d9d9d9;
 	--button-background: #2a2a2a;
 	--button-color: white;
 	--button-background-hover: #3f3f3f;
@@ -277,6 +281,14 @@ code.snippet {
 	display: block;
 }
 
-sticky_icon {
+:any-link.closed {
+	color: var(--closed-link);
+}
+
+.sticky_icon {
 	filter: var(--pin-filter);
+}
+
+.sticky_icon.closed {
+	filter: var(--closed-pin-filter);
 }
