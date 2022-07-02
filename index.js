@@ -625,6 +625,6 @@ app.listen(3000, async () => {
 		uuids.clearAll();
 		console.log(`=> Clearing UUIDs from the DataBase at ${parsed_new}`)
 	}, clear);
-	setInterval(recheck_topics, 60000 * 10)
+	setInterval(recheck_topics, 60000 * 15)
 	recheck_topics()
 });
