@@ -41,7 +41,12 @@ async function recheck_topics() {
 		let date = new Date();
 		console.log(`=> Updating all topics' information ; ${date.getMonth() + 1}(m) ${date.getDate()}, ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
 		data = Buffer.from(await filehandle.readFile(path.join(__dirname, 'users_data.json')), 'buffer').toString('utf-8')
-		let body = JSON.parse(data);
+		let body;
+		try {
+			body = JSON.parse(data);
+		} catch (_) {
+			console.log("=> Happened again, go restore it.")
+		}
 		for (let id in body) {
 			for (let i = 0; i < body[id].stickies.length; i++) {
 				fetch(`https://scratchdb.lefty.one/v3/forum/topic/info/${body[id].stickies[i].topic_ID}`)
@@ -49,7 +54,7 @@ async function recheck_topics() {
 					.then(async e => {
 						body[id].stickies[i].topic_NAME = e.title;
 						body[id].stickies[i].topic_CLOSED = Boolean(e.closed);
-						await filehandle.writeFile(path.join(__dirname, 'users_data.json'), JSON.stringify(body))
+						await filehandle.writeFile(path.join(__dirname, 'users_data.json'), JSON.stringify(body));
 					})
 			}
 		}

@@ -62,6 +62,23 @@ html.dark {
 	--logos_options: left no-repeat;
 }
 
+.statement {
+	padding: 15px;
+	background-color: #f55;
+	color: #002;
+	border: #000 2px solid;
+	margin: 0 -25px 5px -70px;
+	border-radius: 15px;
+}
+
+.statement h2 {
+	text-align: center;
+}
+
+.statement p {
+	text-indent: 2.5rem;
+}
+
 :any-link {
 	color: var(--link);
 }
